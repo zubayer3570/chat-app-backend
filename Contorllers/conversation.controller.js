@@ -6,7 +6,7 @@ const createConversation = async (req, res) => {
         const conversationData = req.body
         const newConversation = new Conversation(conversationData)
         const response = await newConversation.save()
-        io.emit("new_conversation", req.body)
+        await global.io.emit("new_conversation", response)
         res.send(response)
     } catch (error) {
         res.send(error)
