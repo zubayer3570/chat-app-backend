@@ -1,11 +1,13 @@
 const express = require("express")
 const router = express.Router()
-const { sendMsg, getMsgs } = require("../Contorllers/messages.controller")
+const { sendMessage, getMessages } = require("../Contorllers/messages.controller")
 
-const sendMsgRouter = router.post('/', sendMsg)
-const getMsgRouter = router.get('/:conversationId', getMsgs)
+router.get('/', () => console.log("hi"))
+const getMessagesRouter = router.get('/:conversationID', getMessages)
+const sendMsgRouter = router.post('/', sendMessage)
+
 
 module.exports = {
     sendMsgRouter,
-    getMsgRouter
+    getMessagesRouter
 }

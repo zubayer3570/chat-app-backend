@@ -1,7 +1,8 @@
 const mongoose = require("mongoose")
+const { PeopleSchema } = require("./People.model")
 const ConversationSchema = new mongoose.Schema({
     participants: {
-        type: [mongoose.Types.ObjectId],
+        type: [],
         required: true
     }
 }, { timestamps: true })

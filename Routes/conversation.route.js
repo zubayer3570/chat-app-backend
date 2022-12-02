@@ -1,11 +1,11 @@
 const express = require("express")
 const router = express.Router()
-const {createConversation, getConversation} = require("../Contorllers/conversation.controller")
+const { getConversation, checkConversation} = require("../Contorllers/conversation.controller")
 
-const createConversationRouter = router.post('/', createConversation)
-const getConversationRouter = router.get('/:userId', getConversation)
+const getConversationRouter = router.get('/:userID', getConversation)
+const checkConversationRouter = router.post('/', checkConversation)
 
 module.exports = {
-    createConversationRouter,
-    getConversationRouter
+    getConversationRouter,
+    checkConversationRouter
 }

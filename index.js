@@ -23,29 +23,35 @@ io.on("connection", (socket) => {
     global.socket = socket
     global.activeUsers = activeUsers
     
-    socket.on("add_active_user", (data) => {
-        global.userId = data
-        const selected = activeUsers.find(activeUser=> data == activeUser.userId)
+    socket.on("add_active_user", (userId) => {
+        const selected = activeUsers.find(activeUser=> userId == activeUser.userId)
         if(selected){
             selected.socketId = socket.id
         } else{
             activeUsers.push({
-                userId: data,
+                userId,
                 socketId: socket.id
             })
         }
     })
+    socket.on("disconnect", ()=>{
+        const filtered = activeUsers.filter(activeUser => activeUser.socketId != socket.id)
+        activeUsers = filtered
+    })
 })
-const { createUserRouter, getUsersRouter } = require("./Routes/people.route")
-const { createConversationRouter, getConversationRouter } = require("./Routes/conversation.route")
-const { sendMsgRouter, getMsgRouter } = require("./Routes/messages.route")
+const { createUserRouter, getUsersRouter, getUserRouter } = require("./Routes/people.route")
+const { getConversationRouter, checkConversationRouter } = require("./Routes/conversation.route")
+const { sendMsgRouter, getMessagesRouter } = require("./Routes/messages.route")
+const { loginUserRouter } = require("./Routes/login.router")
 
 app.use('/create-user', createUserRouter)
+app.use('/login', loginUserRouter)
 app.use('/get-users', getUsersRouter)
-app.use('/create-conversation', createConversationRouter)
-app.use('/get-converstaions', getConversationRouter)
-app.use('/send-msg', sendMsgRouter)
-app.use('/get-msgs', getMsgRouter)
+app.use('/get-user', getUserRouter)
+app.use('/get-conversations', getConversationRouter)
+app.use('/check-conversation', checkConversationRouter)
+app.use('/send-message', sendMsgRouter)
+app.use('/get-messages', getMessagesRouter)
 
 
 app.get('/', (req, res) => {
