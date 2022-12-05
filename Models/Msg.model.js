@@ -5,11 +5,11 @@ const MsgSchema = new mongoose.Schema({
         required: true
     },
     sender: {
-        type: {},
+        type: Object,
         required: true
     },
     receiver: {
-        type: {},
+        type: Object,
         required: true
     },
     message: {

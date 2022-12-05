@@ -16,29 +16,17 @@ const io = new Server(httpServer, {
         methods: ["GET", "POST"]
     }
 })
-// setting io and socket as a global variable
-let activeUsers = []
-global.io = io
+
+
+let activeUser = []
 io.on("connection", (socket) => {
+    socket.on('new_active_user', (data) => {
+        console.log(data)
+    })
     global.socket = socket
-    global.activeUsers = activeUsers
-    
-    socket.on("add_active_user", (userId) => {
-        const selected = activeUsers.find(activeUser=> userId == activeUser.userId)
-        if(selected){
-            selected.socketId = socket.id
-        } else{
-            activeUsers.push({
-                userId,
-                socketId: socket.id
-            })
-        }
-    })
-    socket.on("disconnect", ()=>{
-        const filtered = activeUsers.filter(activeUser => activeUser.socketId != socket.id)
-        activeUsers = filtered
-    })
+    global.activeUser = activeUser
 })
+
 const { createUserRouter, getUsersRouter, getUserRouter } = require("./Routes/people.route")
 const { getConversationRouter, checkConversationRouter } = require("./Routes/conversation.route")
 const { sendMsgRouter, getMessagesRouter } = require("./Routes/messages.route")
