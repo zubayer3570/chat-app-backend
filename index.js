@@ -18,13 +18,28 @@ const io = new Server(httpServer, {
 })
 
 
-let activeUser = []
+let activeUsers = []
 io.on("connection", (socket) => {
     socket.on('new_active_user', (data) => {
-        console.log(data)
+        const userExists = activeUsers.find(activeUser => activeUser.socketID == data.socketID)
+        if (userExists) {
+            userExists.socketID = data.socketID
+        } else {
+            activeUsers.push(data)
+        }
+        console.log(activeUsers)
     })
+    socket.on('disconnect', () => {
+        activeUsers.forEach(activeUser => {
+            if (activeUser.socketID == socket.id) {
+                activeUsers.splice(activeUsers.indexOf(activeUser), 1)
+            }
+        })
+        console.log(activeUsers)
+    })
+    global.io = io
     global.socket = socket
-    global.activeUser = activeUser
+    global.activeUsers = activeUsers
 })
 
 const { createUserRouter, getUsersRouter, getUserRouter } = require("./Routes/people.route")

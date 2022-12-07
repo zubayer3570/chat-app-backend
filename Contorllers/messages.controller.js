@@ -10,7 +10,6 @@ const sendMessage = async (req, res) => {
             text: messageData.text
         }
         if (!conversationID) {
-            console.log(messageData)
             const participants = [messageData.sender.senderID, messageData.receiver.receiverID]
             const newConversation = new Conversation({
                 participants,
@@ -22,6 +21,12 @@ const sendMessage = async (req, res) => {
             const foundConversation = await Conversation.findOne({ _id: conversationID })
             const update = [...foundConversation.messages, message]
             const updatedDocument = await Conversation.findOneAndUpdate({ _id: conversationID }, { messages: update }, { new: true })
+            activeUsers.forEach(activeUser => {
+                if (activeUser.userID == messageData.receiver.receiverID) {
+                    global.io.to(activeUser.socketID).emit("new_message", updatedDocument)
+                }
+            })
+            global.io.to(socket.id).emit("new_message", updatedDocument)
             res.send(updatedDocument)
         }
     } catch (error) {
