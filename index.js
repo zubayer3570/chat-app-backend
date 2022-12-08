@@ -27,7 +27,6 @@ io.on("connection", (socket) => {
         } else {
             activeUsers.push(data)
         }
-        console.log(activeUsers)
     })
     socket.on('disconnect', () => {
         activeUsers.forEach(activeUser => {
@@ -35,7 +34,6 @@ io.on("connection", (socket) => {
                 activeUsers.splice(activeUsers.indexOf(activeUser), 1)
             }
         })
-        console.log(activeUsers)
     })
     global.io = io
     global.socket = socket

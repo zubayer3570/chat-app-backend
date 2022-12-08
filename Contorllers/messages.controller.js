@@ -1,34 +1,29 @@
 const Message = require("../Models/Msg.model")
 const Conversation = require("../Models/Conversation.model")
 const sendMessage = async (req, res) => {
+    // Saving message to database
     try {
-        const messageData = req.body
-        let conversationID = messageData.conversationID
-        const message = {
-            sender: messageData.sender,
-            receiver: messageData.receiver,
-            text: messageData.text
+        const { sender, receiver, text, conversationID } = req.body
+        const message = { sender, receiver, text, conversationID }
+        //checking if message data has conversatio id in it
+        if (!message.conversationID) {
+            const participants = [sender.senderID, receiver.receiverID]
+            const newConversation = new Conversation({ participants })
+            const insertedConversation = await newConversation.save()
+            //updating the conversation id
+            messageData.conversationID = insertedConversation._id
         }
-        if (!conversationID) {
-            const participants = [messageData.sender.senderID, messageData.receiver.receiverID]
-            const newConversation = new Conversation({
-                participants,
-                messages: [message]
-            })
-            const savedMessage = await newConversation.save()
-            res.send(savedMessage)
-        } else {
-            const foundConversation = await Conversation.findOne({ _id: conversationID })
-            const update = [...foundConversation.messages, message]
-            const updatedDocument = await Conversation.findOneAndUpdate({ _id: conversationID }, { messages: update }, { new: true })
-            activeUsers.forEach(activeUser => {
-                if (activeUser.userID == messageData.receiver.receiverID) {
-                    global.io.to(activeUser.socketID).emit("new_message", updatedDocument)
-                }
-            })
-            global.io.to(socket.id).emit("new_message", updatedDocument)
-            res.send(updatedDocument)
-        }
+        // inserting new message
+        const newMessage = new Message(message)
+        const insertedMessage = await newMessage.save()
+
+        //sending message to socket
+        const selectedUser = activeUsers.find(activeUser => activeUser.userID == receiver.receiverID)
+        io.to(selectedUser?.socketID).emit("new_message", insertedMessage)
+        console.log(insertedMessage)
+
+        //sending response to the client
+        res.send(insertedMessage)
     } catch (error) {
         console.log(error)
         res.send(error)
