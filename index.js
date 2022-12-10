@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
 })
 
 const { createUserRouter, getUsersRouter, getUserRouter } = require("./Routes/people.route")
-const { getConversationRouter, checkConversationRouter } = require("./Routes/conversation.route")
+const { getConversationRouter ,getConversationsRouter, checkConversationRouter } = require("./Routes/conversation.route")
 const { sendMsgRouter, getMessagesRouter } = require("./Routes/messages.route")
 const { loginUserRouter } = require("./Routes/login.router")
 
@@ -49,8 +49,8 @@ app.use('/create-user', createUserRouter)
 app.use('/login', loginUserRouter)
 app.use('/get-users', getUsersRouter)
 app.use('/get-user', getUserRouter)
-app.use('/get-conversations', getConversationRouter)
-app.use('/check-conversation', checkConversationRouter)
+app.use('/get-conversations', getConversationsRouter)
+app.use('/get-conversation', getConversationRouter)
 app.use('/send-message', sendMsgRouter)
 app.use('/get-messages', getMessagesRouter)
 

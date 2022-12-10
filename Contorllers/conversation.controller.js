@@ -1,34 +1,36 @@
 const Conversation = require("../Models/Conversation.model")
 const People = require("../Models/People.model")
-const createConversation = async (req, res) => {
+const getConversation = async (req, res) => {
+    const { participants } = req.body
     try {
-        const participantsIds = req.body.participants
-        const participants = await People.find({ _id: participantsIds })
-        const newConversation = new Conversation({ participants })
-        const conversation = await newConversation.save()
-        res.send(conversation)
+        const populatedPariticipants = await Promise.all(participants.map(async (participantID) => await People.findOne({ _id: participantID }, '-password')))
+        const conversation = await Conversation.findOne({ participants })
+        if (!conversation) {
+            const newConversation = new Conversation({ participants })
+            const insertedConversation = await newConversation.save()
+            // editing the conversation object, and sending the edited version of it, with the user credentials
+            insertedConversation.participants = populatedPariticipants
+            res.send({ conversation: insertedConversation })
+        } else {
+            // editing the conversation object, and sending the edited version of it, with the user credentials
+            conversation.participants = populatedPariticipants
+            res.send({ conversation })
+        }
     } catch (error) {
         res.send(error)
         console.log(error)
     }
 }
-const getConversation = async (req, res) => {
+const getConversations = async (req, res) => {
     const { userID } = req.params
     try {
         const conversations = await Conversation.find({ participants: userID })
-        const conversationPeopleIDs = conversations.map(conversation => conversation.participants[0] == userID ? conversation.participants[1] : conversation.participants[0])
-        const conversationPeople = await People.find({ _id: conversationPeopleIDs })
-        res.send({conversationPeople, conversations})
-    } catch (error) {
-        console.log(error)
-        res.send(error)
-    }
-}
-const checkConversation = async (req, res) => {
-    const { userID, receiverID } = req.body
-    try {
-        const conversation = await Conversation.findOne({ participants: [userID, receiverID] })
-        res.send(conversation)
+        const populatedConversation = await Promise.all(conversations.map(async conversation => {
+            const peopleInfos = await Promise.all(conversation.participants.map(async (participant) => await People.findOne({ _id: participant }, '-password')))
+            conversation.participants = peopleInfos
+            return conversation
+        }))
+        res.send(populatedConversation)
     } catch (error) {
         console.log(error)
         res.send(error)
@@ -36,7 +38,6 @@ const checkConversation = async (req, res) => {
 }
 
 module.exports = {
-    createConversation,
     getConversation,
-    checkConversation
+    getConversations,
 }
