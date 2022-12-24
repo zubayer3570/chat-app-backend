@@ -28,7 +28,26 @@ io.on("connection", (socket) => {
             activeUsers.push(data)
         }
     })
-    socket.on('disconnect', () => {
+    socket.on("new_opened_conversation", (data) => {
+        activeUsers.forEach(activeUser => {
+            if (activeUser.userID == data.userID) {
+                activeUser.openedConversationID = data.openedConversationID
+            }
+        })
+        console.log(activeUsers)
+    })
+    socket.on('disconnect', async (res) => {
+        // deleting the conversations, which has no messages
+        const conversations = await Conversation.find({})
+        const messsageDoseNotExists = await Promise.all(conversations.map(async conversation => {
+            const found = await Message.findOne({ conversationID: conversation._id })
+            if (!found) {
+                return conversation._id;
+            }
+        }))
+        await Conversation.deleteMany({ _id: { $in: messsageDoseNotExists } })
+
+        // removing the user from activeUsers array of the server
         activeUsers.forEach(activeUser => {
             if (activeUser.socketID == socket.id) {
                 activeUsers.splice(activeUsers.indexOf(activeUser), 1)
@@ -41,9 +60,11 @@ io.on("connection", (socket) => {
 })
 
 const { createUserRouter, getUsersRouter, getUserRouter } = require("./Routes/people.route")
-const { getConversationRouter ,getConversationsRouter, checkConversationRouter } = require("./Routes/conversation.route")
+const { getConversationRouter, getConversationsRouter, checkConversationRouter } = require("./Routes/conversation.route")
 const { sendMsgRouter, getMessagesRouter } = require("./Routes/messages.route")
 const { loginUserRouter } = require("./Routes/login.router")
+const Conversation = require("./Models/Conversation.model")
+const Message = require("./Models/Msg.model")
 
 app.use('/create-user', createUserRouter)
 app.use('/login', loginUserRouter)

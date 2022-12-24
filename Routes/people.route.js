@@ -3,7 +3,7 @@ const router = express.Router()
 const { createUser, getUsers, getUser } = require('../Contorllers/people.controller')
 
 const createUserRouter = router.post('/', createUser)
-const getUsersRouter = router.get('/', getUsers)
+const getUsersRouter = router.get('/:userID', getUsers)
 const getUserRouter = router.get('/:userID', getUser)
 
 module.exports = {

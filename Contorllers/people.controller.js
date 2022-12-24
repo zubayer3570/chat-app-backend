@@ -24,8 +24,14 @@ const loginUser = async (req, res)=>{
     }
 }
 const getUsers = async (req, res) => {
+    const userID = req.params.userID
     try {
         const result = await People.find({})
+        result.forEach(user=>{
+            if(user._id == userID){
+                result.splice(result.indexOf(user), 1)
+            }
+        })
         res.send(result)
     } catch (error) {
         res.send(error)

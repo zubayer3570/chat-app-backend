@@ -5,16 +5,16 @@ const getConversation = async (req, res) => {
     try {
         const populatedPariticipants = await Promise.all(participants.map(async (participantID) => await People.findOne({ _id: participantID }, '-password')))
         const conversation = await Conversation.findOne({ participants })
-        if (!conversation) {
+        if (conversation) {
+            // editing the conversation object, and sending the edited version of it, with the user credentials
+            conversation.participants = populatedPariticipants
+            res.send({ conversation })
+        } else {
             const newConversation = new Conversation({ participants })
             const insertedConversation = await newConversation.save()
             // editing the conversation object, and sending the edited version of it, with the user credentials
             insertedConversation.participants = populatedPariticipants
             res.send({ conversation: insertedConversation })
-        } else {
-            // editing the conversation object, and sending the edited version of it, with the user credentials
-            conversation.participants = populatedPariticipants
-            res.send({ conversation })
         }
     } catch (error) {
         res.send(error)

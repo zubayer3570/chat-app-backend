@@ -1,17 +1,20 @@
 const Message = require("../Models/Msg.model")
-const Conversation = require("../Models/Conversation.model")
 const sendMessage = async (req, res) => {
     // Saving message to database
     try {
         const { sender, receiver, text, conversationID } = req.body
         const message = { sender, receiver, text, conversationID }
+        
         // inserting new message
         const newMessage = new Message(message)
         const insertedMessage = await newMessage.save()
 
         //sending message to socket
-        const selectedUser = activeUsers.find(activeUser => activeUser.userID == receiver.receiverID)
-        io.to(selectedUser?.socketID).emit("new_message", insertedMessage)
+        activeUsers.forEach(activeUser=> {
+            if(activeUser.openedConversationID == message.conversationID){
+                io.to(activeUser.socketID).emit("new_message", insertedMessage)
+            }
+        })
 
         //sending response to the client
         res.send(insertedMessage)
