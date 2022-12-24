@@ -1,3 +1,4 @@
+const { isObjectIdOrHexString } = require("mongoose")
 const Conversation = require("../Models/Conversation.model")
 const People = require("../Models/People.model")
 const getConversation = async (req, res) => {
@@ -14,6 +15,11 @@ const getConversation = async (req, res) => {
             const insertedConversation = await newConversation.save()
             // editing the conversation object, and sending the edited version of it, with the user credentials
             insertedConversation.participants = populatedPariticipants
+            activeUsers.forEach(activeUser => {
+                if (activeUser.userID == participants[1]) {
+                    io.to(activeUser.socketID).emit("new_conversation", insertedConversation)
+                }
+            })
             res.send({ conversation: insertedConversation })
         }
     } catch (error) {

@@ -34,9 +34,8 @@ io.on("connection", (socket) => {
                 activeUser.openedConversationID = data.openedConversationID
             }
         })
-        console.log(activeUsers)
     })
-    socket.on('disconnect', async (res) => {
+    socket.on('disconnect', async () => {
         // deleting the conversations, which has no messages
         const conversations = await Conversation.find({})
         const messsageDoseNotExists = await Promise.all(conversations.map(async conversation => {
