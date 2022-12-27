@@ -13,6 +13,7 @@ const getConversation = async (req, res) => {
         } else {
             const newConversation = new Conversation({ participants })
             const insertedConversation = await newConversation.save()
+            
             // editing the conversation object, and sending the edited version of it, with the user credentials
             insertedConversation.participants = populatedPariticipants
             activeUsers.forEach(activeUser => {

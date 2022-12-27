@@ -10,13 +10,13 @@ const sendMessage = async (req, res) => {
         const insertedMessage = await newMessage.save()
 
         //sending message to socket
-        activeUsers.forEach(activeUser => {
-            if (receiver._id == activeUser.userID) {
-                if (activeUser.openedConversationID == message.conversationID) {
-                    io.to(activeUser.socketID).emit("new_message", insertedMessage)
-                }
-            }
-        })
+        // activeUsers.forEach(activeUser => {
+        //     if (receiver._id == activeUser.userID) {
+        //         if (activeUser.openedConversationID == message.conversationID) { 
+        //             io.to(activeUser.socketID).emit("new_message", insertedMessage)
+        //         }
+        //     }
+        // })
 
         //sending response to the client
         res.send(insertedMessage)

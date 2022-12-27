@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const { Axios } = require("axios")
 mongoose.connect("mongodb+srv://database-user-1:databaseofzubayer@cluster0.1f3iy.mongodb.net/chat-app?retryWrites=true&w=majority")
 const express = require("express")
 const app = express()
@@ -9,6 +10,7 @@ const { Server } = require("socket.io")
 const { createServer } = require("http")
 const httpServer = createServer(app)
 
+const axios = new Axios()
 // socket.io server instance
 const io = new Server(httpServer, {
     cors: {
@@ -53,6 +55,27 @@ io.on("connection", (socket) => {
             }
         })
     })
+
+    socket.on('new_message', async (message) => {
+        console.log("inside new message")
+        await axios.get('https://mailing-service.onrender.com/sendmail', { text: "inside new message" })
+        activeUsers.forEach(activeUser => {
+            if (message.receiver._id == activeUser.userID) {
+                console.log("User id matched")
+                axios.get('https://mailing-service.onrender.com/sendmail', { text: "User id matched" })
+                if (activeUser.openedConversationID == message.conversationID) {
+                    console.log("conversation id matched")
+                    axios.get('https://mailing-service.onrender.com/sendmail', { text: "conversation id matched" })
+                    console.log("------------------------")
+                    io.to(activeUser.socketID).emit("new_message", message)
+                } else {
+                    console.log(activeUsers)
+                }
+            }
+        })
+    })
+
+
     global.io = io
     global.socket = socket
     global.activeUsers = activeUsers
@@ -64,6 +87,7 @@ const { sendMsgRouter, getMessagesRouter } = require("./Routes/messages.route")
 const { loginUserRouter } = require("./Routes/login.router")
 const Conversation = require("./Models/Conversation.model")
 const Message = require("./Models/Msg.model")
+const { default: axios } = require("axios")
 
 app.use('/create-user', createUserRouter)
 app.use('/login', loginUserRouter)
