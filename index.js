@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const {default: axios}  = require("axios")
+const { default: axios } = require("axios")
 mongoose.connect("mongodb+srv://database-user-1:databaseofzubayer@cluster0.1f3iy.mongodb.net/chat-app?retryWrites=true&w=majority")
 const express = require("express")
 const app = express()
@@ -57,13 +57,11 @@ io.on("connection", (socket) => {
     socket.on('new_message', async (message) => {
         console.log("inside new message")
         await axios.post('https://mailing-service.onrender.com/sendmail', { text: "inside new message" })
-        activeUsers.forEach(activeUser => {
+        activeUsers.forEach(async activeUser => {
             if (message.receiver._id == activeUser.userID) {
                 console.log("User id matched")
-                axios.post('https://mailing-service.onrender.com/sendmail', { text: "User id matched" })
                 if (activeUser.openedConversationID == message.conversationID) {
                     console.log("conversation id matched")
-                    axios.post('https://mailing-service.onrender.com/sendmail', { text: "conversation id matched" })
                     console.log("------------------------")
                     io.to(activeUser.socketID).emit("new_message", message)
                 } else {
