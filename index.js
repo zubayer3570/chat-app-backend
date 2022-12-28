@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const axios  = require("axios")
+const {default: axios}  = require("axios")
 mongoose.connect("mongodb+srv://database-user-1:databaseofzubayer@cluster0.1f3iy.mongodb.net/chat-app?retryWrites=true&w=majority")
 const express = require("express")
 const app = express()
@@ -9,7 +9,6 @@ app.use(cors())
 const { Server } = require("socket.io")
 const { createServer } = require("http")
 const httpServer = createServer(app)
-
 // socket.io server instance
 const io = new Server(httpServer, {
     cors: {
@@ -86,7 +85,6 @@ const { sendMsgRouter, getMessagesRouter } = require("./Routes/messages.route")
 const { loginUserRouter } = require("./Routes/login.router")
 const Conversation = require("./Models/Conversation.model")
 const Message = require("./Models/Msg.model")
-const { default: axios } = require("axios")
 
 app.use('/create-user', createUserRouter)
 app.use('/login', loginUserRouter)
