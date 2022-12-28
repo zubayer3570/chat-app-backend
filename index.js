@@ -58,7 +58,7 @@ io.on("connection", (socket) => {
         console.log("inside new message")
         activeUsers.forEach(async activeUser => {
             if (message.receiver._id == activeUser.userID) {
-                io.emit("User_id_matched", "User_id_matched")
+                io.emit("User_id_matched", activeUsers)
                 console.log("User id matched")
                 if (activeUser.openedConversationID == message.conversationID) {
                     io.emit("Conversation_id_matched", "Conversation_id_matched")
