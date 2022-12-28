@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-const { Axios } = require("axios")
+const axios  = require("axios")
 mongoose.connect("mongodb+srv://database-user-1:databaseofzubayer@cluster0.1f3iy.mongodb.net/chat-app?retryWrites=true&w=majority")
 const express = require("express")
 const app = express()
@@ -10,7 +10,6 @@ const { Server } = require("socket.io")
 const { createServer } = require("http")
 const httpServer = createServer(app)
 
-const axios = new Axios()
 // socket.io server instance
 const io = new Server(httpServer, {
     cors: {
