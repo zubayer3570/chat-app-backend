@@ -55,19 +55,11 @@ io.on("connection", (socket) => {
     })
 
     socket.on('new_message', async (message) => {
-        console.log("inside new message")
         activeUsers.forEach(async activeUser => {
-            if (message.receiver._id == activeUser.userID) {
-                io.emit("User_id_matched", activeUsers)
-                console.log("User id matched")
-                if (activeUser.openedConversationID == message.conversationID) {
-                    io.emit("Conversation_id_matched", "Conversation_id_matched")
-                    console.log("conversation id matched")
-                    console.log("------------------------")
-                    io.to(activeUser.socketID).emit("new_message", message)
-                } else {
-                    console.log(activeUsers)
-                }
+            if (activeUser.openedConversationID == message.conversationID) {
+                io.to(activeUser.socketID).emit("new_message", message)
+            } else {
+                console.log(activeUsers)
             }
         })
     })
