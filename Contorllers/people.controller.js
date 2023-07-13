@@ -1,46 +1,53 @@
-const People = require("../Models/People.model")
+const { nanoid } = require("nanoid")
+const User = require("../Models/User.model")
+const Conversation = require("../Models/Conversation.model")
+const cloudinary = require("cloudinary").v2
+cloudinary.config({
+    cloud_name: "da6qlanq1",
+    api_key: "855239541721646",
+    api_secret: "47BYqZca9ceCBRUwmZ1MjQlO_0o"
+})
 
-const createUser = async (req, res) => {
-    
+const signupController = async (req, res) => {
     try {
-        const userData = req.body
-        const newUser = new People(userData)
+        const cloudinaryResponse = await cloudinary.uploader.upload("upload/" + req.file.filename, { resource_type: "image", use_filename: true })
+        const _id = nanoid()
+        const userData = { ...req.body, profileImg: cloudinaryResponse.secure_url, _id, conversationIDs: [] }
+        const newUser = new User(userData)
         const response = await newUser.save()
-        await io.emit("new_user", response)
+        // await io.emit("new_user", response)
         res.send(response)
     } catch (error) {
         res.send(error)
-        console.log(error)
     }
 }
-const loginUser = async (req, res)=>{
+const loginUser = async (req, res) => {
     try {
-        const userData = req.body
-        const user = await People.findOne(userData)
-        res.send(user)
+        const { email } = req.body
+        const user = await User.findOne({ email })
+        if (user._id && user.password == req.body.password) {
+            const populatedConverstaions = await Conversation.find({ _id: user.conversationIDs })
+            res.send({ ...user._doc, conversations: populatedConverstaions })
+        } else {
+            res.send({ message: "Something went wrong!" })
+        }
     } catch (error) {
+        console.log("hi")
         res.send(error)
-        console.log(error)
     }
 }
-const getUsers = async (req, res) => {
-    const userID = req.params.userID
+const getAllUsers = async (req, res) => {
     try {
-        const result = await People.find({})
-        result.forEach(user=>{
-            if(user._id == userID){
-                result.splice(result.indexOf(user), 1)
-            }
-        })
+        const result = await User.find({}, "name email profileImg _id")
         res.send(result)
     } catch (error) {
         res.send(error)
     }
 }
 const getUser = async (req, res) => {
-    const {userID} = req.params
+    const { userID } = req.params
     try {
-        const user = await People.findOne({_id: userID})
+        const user = await People.findOne({ _id: userID })
         res.send(user)
     } catch (error) {
         res.send(error)
@@ -48,8 +55,8 @@ const getUser = async (req, res) => {
 }
 
 module.exports = {
-    createUser,
-    getUsers,
+    signupController,
+    getAllUsers,
     getUser,
     loginUser
 }
