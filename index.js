@@ -23,55 +23,23 @@ global.activeUsers = new Map()
 global.io = io
 io.on("connection", (socket) => {
     global.socket = socket
-    socket.on("new_user", (data) => {
+    
+    socket.on("new_active_user", (data) => {
         global.activeUsers.set(data.userEmail, data.socketID)
-        // const tempActiveUsers = activeUsers.filter(user => user.userEmail != data.userEmail)
-        // console.log([...tempActiveUsers, data])
-        // global.activeUsers = [...tempActiveUsers, data]
+        const activeUsersEmail = [...activeUsers.keys()]
+        io.emit("active_status_updated", activeUsersEmail)
     })
-    // socket.on('new_active_user', (data) => {
-    //     const userExists = activeUsers.find(activeUser => activeUser.socketID == data.socketID)
-    //     if (userExists) {
-    //         userExists.socketID = data.socketID
-    //     } else {
-    //         activeUsers.push(data)
-    //     }
-    // })
-    // socket.on("new_opened_conversation", (data) => {
-    //     activeUsers.forEach(activeUser => {
-    //         if (activeUser.userID == data.userID) {
-    //             activeUser.openedConversationID = data.openedConversationID
-    //         }
-    //     })
-    // })
-    // socket.on('disconnect', async () => {
-    //     // deleting the conversations, which has no messages
-    //     const conversations = await Conversation.find({})
-    //     const messsageDoseNotExists = await Promise.all(conversations.map(async conversation => {
-    //         const found = await Message.findOne({ conversationID: conversation._id })
-    //         if (!found) {
-    //             return conversation._id;
-    //         }
-    //     }))
-    //     await Conversation.deleteMany({ _id: { $in: messsageDoseNotExists } })
 
-    //     // removing the user from activeUsers array of the server
-    //     activeUsers.forEach(activeUser => {
-    //         if (activeUser.socketID == socket.id) {
-    //             activeUsers.splice(activeUsers.indexOf(activeUser), 1)
-    //         }
-    //     })
-    // })
-
-    // socket.on('new_message', async (message) => {
-    //     activeUsers.forEach(async activeUser => {
-    //         if (activeUser.openedConversationID == message.conversationID) {
-    //             io.to(activeUser.socketID).emit("new_message", message)
-    //         } else {
-    //             console.log(activeUsers)
-    //         }
-    //     })
-    // })
+    socket.on("disconnect", () => {
+        activeUsers.forEach((value, key) => {
+            if (value == socket.id) {
+                activeUsers.delete(key)
+            }
+        })
+        console.log(activeUsers)
+        const activeUsersEmail = [...activeUsers.keys()]
+        io.emit("active_status_updated", activeUsersEmail)
+    })
 })
 
 const { signupRoute } = require("./Routes/sinup.route")

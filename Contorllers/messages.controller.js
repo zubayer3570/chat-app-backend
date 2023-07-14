@@ -7,16 +7,15 @@ const User = require("../Models/User.model")
 const sendText = async (req, res) => {
     // Saving message to database
     try {
-        const { sender, receiver, text, unread, conversationID } = req.body
+        const { sender, receiver, text, unread } = req.body
         delete sender.conversations
+        const conversation = await Conversation.findOne({ participantsIds: [sender._id + "###" + receiver._id, receiver._id + "###" + sender._id] })
         const message = { _id: nanoid(), sender, receiver, text, unread }
-        if (conversationID) {
-            message.conversationID = conversationID
-            await Conversation.updateOne({ _id: conversationID }, { $set: { lastMessage: message } })
+        if (conversation) {
+            message.conversationID = conversation._id
+            await Conversation.updateOne({ _id: conversation._id }, { $set: { lastMessage: message } })
             io.to(activeUsers.get(sender.email)).to(activeUsers.get(receiver.email)).emit("new_last_message", message)
-        }
-
-        if (!conversationID) {
+        } else {
             // Manually creating a conversation ID
             const genConvoId = nanoid()
 
