@@ -1,6 +1,4 @@
-const { isObjectIdOrHexString } = require("mongoose")
 const Conversation = require("../Models/Conversation.model")
-const People = require("../Models/People.model")
 
 const getConversations = async (req, res) => {
     const { userID } = req.params
@@ -18,6 +16,13 @@ const getConversations = async (req, res) => {
     }
 }
 
+const updateUnread = async (req, res) => {
+    const { conversationID } = req.body
+    const updatedConversation = await Conversation.findOneAndUpdate({ _id: conversationID }, { "lastMessage.unread": false }, {new: true})
+    res.send(updatedConversation)
+}
+
+
 module.exports = {
-    getConversations,
+    getConversations, updateUnread
 }

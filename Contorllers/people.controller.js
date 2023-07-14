@@ -23,9 +23,9 @@ const signupController = async (req, res) => {
 }
 const loginUser = async (req, res) => {
     try {
-        const { email } = req.body
+        const { email, password } = req.body
         const user = await User.findOne({ email })
-        if (user._id && user.password == req.body.password) {
+        if (user && user.password == password) {
             const populatedConverstaions = await Conversation.find({ _id: user.conversationIDs })
             res.send({ ...user._doc, conversations: populatedConverstaions })
         } else {

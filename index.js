@@ -19,51 +19,59 @@ const io = new Server(httpServer, {
 })
 
 
-let activeUsers = []
+global.activeUsers = new Map()
+global.io = io
 io.on("connection", (socket) => {
-    socket.on('new_active_user', (data) => {
-        const userExists = activeUsers.find(activeUser => activeUser.socketID == data.socketID)
-        if (userExists) {
-            userExists.socketID = data.socketID
-        } else {
-            activeUsers.push(data)
-        }
+    global.socket = socket
+    socket.on("new_user", (data) => {
+        global.activeUsers.set(data.userEmail, data.socketID)
+        // const tempActiveUsers = activeUsers.filter(user => user.userEmail != data.userEmail)
+        // console.log([...tempActiveUsers, data])
+        // global.activeUsers = [...tempActiveUsers, data]
     })
-    socket.on("new_opened_conversation", (data) => {
-        activeUsers.forEach(activeUser => {
-            if (activeUser.userID == data.userID) {
-                activeUser.openedConversationID = data.openedConversationID
-            }
-        })
-    })
-    socket.on('disconnect', async () => {
-        // deleting the conversations, which has no messages
-        const conversations = await Conversation.find({})
-        const messsageDoseNotExists = await Promise.all(conversations.map(async conversation => {
-            const found = await Message.findOne({ conversationID: conversation._id })
-            if (!found) {
-                return conversation._id;
-            }
-        }))
-        await Conversation.deleteMany({ _id: { $in: messsageDoseNotExists } })
+    // socket.on('new_active_user', (data) => {
+    //     const userExists = activeUsers.find(activeUser => activeUser.socketID == data.socketID)
+    //     if (userExists) {
+    //         userExists.socketID = data.socketID
+    //     } else {
+    //         activeUsers.push(data)
+    //     }
+    // })
+    // socket.on("new_opened_conversation", (data) => {
+    //     activeUsers.forEach(activeUser => {
+    //         if (activeUser.userID == data.userID) {
+    //             activeUser.openedConversationID = data.openedConversationID
+    //         }
+    //     })
+    // })
+    // socket.on('disconnect', async () => {
+    //     // deleting the conversations, which has no messages
+    //     const conversations = await Conversation.find({})
+    //     const messsageDoseNotExists = await Promise.all(conversations.map(async conversation => {
+    //         const found = await Message.findOne({ conversationID: conversation._id })
+    //         if (!found) {
+    //             return conversation._id;
+    //         }
+    //     }))
+    //     await Conversation.deleteMany({ _id: { $in: messsageDoseNotExists } })
 
-        // removing the user from activeUsers array of the server
-        activeUsers.forEach(activeUser => {
-            if (activeUser.socketID == socket.id) {
-                activeUsers.splice(activeUsers.indexOf(activeUser), 1)
-            }
-        })
-    })
+    //     // removing the user from activeUsers array of the server
+    //     activeUsers.forEach(activeUser => {
+    //         if (activeUser.socketID == socket.id) {
+    //             activeUsers.splice(activeUsers.indexOf(activeUser), 1)
+    //         }
+    //     })
+    // })
 
-    socket.on('new_message', async (message) => {
-        activeUsers.forEach(async activeUser => {
-            if (activeUser.openedConversationID == message.conversationID) {
-                io.to(activeUser.socketID).emit("new_message", message)
-            } else {
-                console.log(activeUsers)
-            }
-        })
-    })
+    // socket.on('new_message', async (message) => {
+    //     activeUsers.forEach(async activeUser => {
+    //         if (activeUser.openedConversationID == message.conversationID) {
+    //             io.to(activeUser.socketID).emit("new_message", message)
+    //         } else {
+    //             console.log(activeUsers)
+    //         }
+    //     })
+    // })
 })
 
 const { signupRoute } = require("./Routes/sinup.route")
@@ -71,12 +79,14 @@ const { loginUserRouter } = require("./Routes/login.route")
 const { allUsersRoute } = require("./Routes/allUsers.route")
 const { sendTextRoute } = require("./Routes/sendText.route")
 const { getTextsRoute } = require("./Routes/getTexts.route")
+const { updateUnreadRoute } = require("./Routes/updateUnread.route")
 
 app.use('/signup', signupRoute)
 app.use('/login', loginUserRouter)
 app.use('/all-users', allUsersRoute)
 app.use('/send-text', sendTextRoute)
 app.use('/get-texts', getTextsRoute)
+app.use('/update-unread', updateUnreadRoute)
 
 
 app.get('/', (req, res) => {
