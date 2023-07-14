@@ -7,12 +7,16 @@ const User = require("../Models/User.model")
 const sendText = async (req, res) => {
     // Saving message to database
     try {
-        const { sender, receiver, text, unread } = req.body
+        const { sender, receiver, text, unread, conversationID } = req.body
+        delete sender.conversations
         const message = { _id: nanoid(), sender, receiver, text, unread }
+        if (conversationID) {
+            message.conversationID = conversationID
+            await Conversation.updateOne({ _id: conversationID }, { $set: { lastMessage: message } })
+            io.to(activeUsers.get(sender.email)).to(activeUsers.get(receiver.email)).emit("new_last_message", message)
+        }
 
-        const conversation = await Conversation.findOne({ participantsIds: [sender._id + "###" + receiver._id, receiver._id + "###" + sender._id] })
-
-        if (!conversation) {
+        if (!conversationID) {
             // Manually creating a conversation ID
             const genConvoId = nanoid()
 
@@ -36,14 +40,6 @@ const sendText = async (req, res) => {
             await newConversation.save()
         }
 
-        if (conversation) {
-            message.conversationID = conversation._id
-            io.to(activeUsers.get(sender.email)).to(activeUsers.get(receiver.email)).emit("new_last_message", message)
-            await Conversation.updateOne({ _id: conversation._id }, { $set: { lastMessage: message } })
-        }
-
-
-        // updating last message in conversation
 
         // socket
         io.to(activeUsers.get(sender.email)).to(activeUsers.get(receiver.email)).emit("new_message", message)
@@ -59,6 +55,8 @@ const sendText = async (req, res) => {
         res.send(error)
     }
 }
+
+
 const getTexts = async (req, res) => {
     const { conversationID } = req.body
     try {
