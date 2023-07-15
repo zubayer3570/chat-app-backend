@@ -5,7 +5,8 @@ const UserSchema = new mongoose.Schema({
     name: String,
     password: String,
     email: String,
-    conversationIDs: Array
+    conversationIDs: Array,
+    active: Boolean
 }, { timestamps: true })
 const User = mongoose.model("people", UserSchema)
 module.exports = User

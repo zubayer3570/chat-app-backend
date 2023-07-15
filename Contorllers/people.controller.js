@@ -15,7 +15,7 @@ const signupController = async (req, res) => {
         const userData = { ...req.body, profileImg: cloudinaryResponse.secure_url, _id, conversationIDs: [] }
         const newUser = new User(userData)
         const response = await newUser.save()
-        // await io.emit("new_active_user", response)
+        await io.emit("new_user", { ...response, active: true })
         res.send(response)
     } catch (error) {
         res.send(error)
@@ -38,9 +38,20 @@ const loginUser = async (req, res) => {
 }
 const getAllUsers = async (req, res) => {
     try {
-        const result = await User.find({}, "name email profileImg _id")
-        res.send(result)
+        const result = await User.find({}, "name email profileImg _id active conversationIDs")
+
+        // sending all user after updating their active status
+        const updated = result.map(user => {
+            activeUsersEmail.map(activeUserEmail => {
+                if (activeUserEmail == user.email) {
+                    user.active = true
+                }
+            })
+            return user
+        })
+        res.send(updated)
     } catch (error) {
+        console.log(error)
         res.send(error)
     }
 }

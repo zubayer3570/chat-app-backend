@@ -23,10 +23,10 @@ global.activeUsers = new Map()
 global.io = io
 io.on("connection", (socket) => {
     global.socket = socket
-    
+
     socket.on("new_active_user", (data) => {
         global.activeUsers.set(data.userEmail, data.socketID)
-        const activeUsersEmail = [...activeUsers.keys()]
+        global.activeUsersEmail = [...activeUsers.keys()]
         io.emit("active_status_updated", activeUsersEmail)
     })
 
@@ -36,8 +36,7 @@ io.on("connection", (socket) => {
                 activeUsers.delete(key)
             }
         })
-        console.log(activeUsers)
-        const activeUsersEmail = [...activeUsers.keys()]
+        global.activeUsersEmail = [...activeUsers.keys()]
         io.emit("active_status_updated", activeUsersEmail)
     })
 })
