@@ -25,7 +25,9 @@ const signupController = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body
+        // console.log(email)
         const user = await User.findOne({ email })
+        // console.log(user)
         if (user && user.password == password) {
             const populatedConverstaions = await Conversation.find({ _id: user.conversationIDs })
             res.send({ ...user._doc, conversations: populatedConverstaions })
@@ -43,7 +45,7 @@ const getAllUsers = async (req, res) => {
 
         // sending all user after updating their active status
         const updated = result.map(user => {
-            activeUsersEmail.map(activeUserEmail => {
+            activeUsersEmail?.map(activeUserEmail => {
                 if (activeUserEmail == user.email) {
                     user.active = true
                 }

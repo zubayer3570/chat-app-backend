@@ -25,6 +25,7 @@ io.on("connection", (socket) => {
     global.socket = socket
 
     socket.on("new_active_user", (data) => {
+        console.log(data.userEmail)
         global.activeUsers.set(data.userEmail, data.socketID)
         global.activeUsersEmail = [...activeUsers.keys()]
         io.emit("active_status_updated", activeUsersEmail)
@@ -37,6 +38,8 @@ io.on("connection", (socket) => {
             }
         })
         global.activeUsersEmail = [...activeUsers.keys()]
+        console.log("disconnect")
+        // console.log(activeUsersEmail)
         io.emit("active_status_updated", activeUsersEmail)
     })
 })
@@ -55,6 +58,9 @@ app.use('/send-text', sendTextRoute)
 app.use('/get-texts', getTextsRoute)
 app.use('/update-unread', updateUnreadRoute)
 
+app.post('/send-height', (req, res)=>{
+    console.log(req.body)
+})
 
 app.get('/', (req, res) => {
     const x = nanoid(30)
