@@ -42,7 +42,17 @@ io.on("connection", (socket) => {
         // console.log(activeUsersEmail)
         io.emit("active_status_updated", activeUsersEmail)
     })
+    socket.on("new_message", (data) => {
+        if (data.conversationID) {
+            io.to(activeUsers.get(data.receiver.email)).emit("new_message", data)
+        }
+    })
+    socket.on("new_conversation", (data) => {
+        io.to(activeUsers.get(data.lastMessage?.receiver.email)).emit("new_conversation", data)
+    })
 })
+
+// socket
 
 const { signupRoute } = require("./Routes/sinup.route")
 const { loginUserRouter } = require("./Routes/login.route")
@@ -50,6 +60,7 @@ const { allUsersRoute } = require("./Routes/allUsers.route")
 const { sendTextRoute } = require("./Routes/sendText.route")
 const { getTextsRoute } = require("./Routes/getTexts.route")
 const { updateUnreadRoute } = require("./Routes/updateUnread.route")
+const { addConversation } = require("./Contorllers/conversation.controller")
 
 app.use('/signup', signupRoute)
 app.use('/login', loginUserRouter)
@@ -57,8 +68,9 @@ app.use('/all-users', allUsersRoute)
 app.use('/send-text', sendTextRoute)
 app.use('/get-texts', getTextsRoute)
 app.use('/update-unread', updateUnreadRoute)
+app.use('/add-conversation', addConversation)
 
-app.post('/send-height', (req, res)=>{
+app.post('/send-height', (req, res) => {
     console.log(req.body)
 })
 
