@@ -10,7 +10,7 @@ const sendText = async (req, res) => {
         const message = req.body
         const newMessage = new Message(message)
         const insertedMessage = await newMessage.save()
-        await Conversation.updateOne({ _id: message.conversationId }, { lastMessage: message })
+        await Conversation.updateOne({ _id: message.conversationID }, { $set: { lastMessage: message } })
 
         //sending response to the client
         res.send(insertedMessage)

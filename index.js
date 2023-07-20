@@ -50,6 +50,9 @@ io.on("connection", (socket) => {
     socket.on("new_conversation", (data) => {
         io.to(activeUsers.get(data.lastMessage?.receiver.email)).emit("new_conversation", data)
     })
+    socket.on("new_last_message", (data) => {
+        io.to(activeUsers.get(data.receiver.email)).emit("new_last_message", data)
+    })
 })
 
 // socket

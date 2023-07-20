@@ -28,6 +28,7 @@ const getConversations = async (req, res) => {
 const updateUnread = async (req, res) => {
     const { conversationID } = req.body
     const updatedConversation = await Conversation.findOneAndUpdate({ _id: conversationID }, { "lastMessage.unread": false }, { new: true })
+    console.log(updatedConversation.lastMessage.unread)
     res.send(updatedConversation)
 }
 

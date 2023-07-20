@@ -16,7 +16,7 @@ const signupController = async (req, res) => {
         const newUser = new User(userData)
         const response = await newUser.save()
         await io.emit("new_user", response)
-        res.send({ ...response._doc, active: true, conversations: [] })
+        res.send({ ...response._doc, conversations: [] })
     } catch (error) {
         res.send(error)
     }
