@@ -14,9 +14,9 @@ const signupController = async (req, res) => {
         const _id = nanoid()
         const userData = { ...req.body, profileImg: cloudinaryResponse.secure_url, _id, conversationIDs: [] }
         const newUser = new User(userData)
-        const response = await newUser.save()
-        await io.emit("new_user", response)
-        res.send({ ...response._doc, conversations: [] })
+        const user = await newUser.save()
+        await io.emit("new_user", user)
+        res.send({ user, conversations: [] })
     } catch (error) {
         res.send(error)
     }
