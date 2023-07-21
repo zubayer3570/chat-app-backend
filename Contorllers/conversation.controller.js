@@ -19,5 +19,5 @@ const updateUnread = async (req, res) => {
 
 
 module.exports = {
-    getConversations, updateUnread, addConversation
+    updateUnread, addConversation
 }

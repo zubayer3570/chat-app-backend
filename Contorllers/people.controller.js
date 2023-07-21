@@ -30,7 +30,7 @@ const loginUser = async (req, res) => {
         if (user && user.password == password) {
             const conversations = await Conversation.find({ _id: user.conversationIDs })
             res.send({ user, conversations })
-            // res.send({ ...user._doc, conversations: populatedConverstaions })
+            // res.send({ ...user._doc, conversations: populatedConversations })
         } else {
             res.send({ message: "Something went wrong!" })
         }
