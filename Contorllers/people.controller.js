@@ -28,8 +28,9 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email })
         // console.log(user)
         if (user && user.password == password) {
-            const populatedConverstaions = await Conversation.find({ _id: user.conversationIDs })
-            res.send({ ...user._doc, conversations: populatedConverstaions })
+            const conversations = await Conversation.find({ _id: user.conversationIDs })
+            res.send({ user, conversations })
+            // res.send({ ...user._doc, conversations: populatedConverstaions })
         } else {
             res.send({ message: "Something went wrong!" })
         }
@@ -44,11 +45,15 @@ const getAllUsers = async (req, res) => {
 
         // sending all user after updating their active status
         const updated = result.map(user => {
-            activeUsersEmail?.map(activeUserEmail => {
-                if (activeUserEmail == user.email) {
-                    user.active = true
-                }
-            })
+            const userIsActive = activeUsers.get(user.email)
+            if (userIsActive) {
+                user.active = true
+            }
+            // activeUsersEmail?.map(activeUserEmail => {
+            //     if (activeUserEmail == user.email) {
+            //         user.active = true
+            //     }
+            // })
             return user
         })
         res.send(updated)
