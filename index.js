@@ -14,7 +14,7 @@ require("dotenv").config()
 // firebase cloude messaging
 const firebase = require("firebase-admin");
 
-const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+const serviceAccount = require('./firebase-private-key.json');
 
 firebase.initializeApp({
     credential: firebase.credential.cert(serviceAccount)
