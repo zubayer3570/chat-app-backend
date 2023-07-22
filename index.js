@@ -1,6 +1,5 @@
 const { nanoid } = require("nanoid")
 const mongoose = require("mongoose")
-const axios = require("axios")
 mongoose.connect("mongodb+srv://database-user-1:databaseofzubayer@cluster0.1f3iy.mongodb.net/chat-app?retryWrites=true&w=majority")
 const express = require("express")
 const app = express()
@@ -13,13 +12,13 @@ const httpServer = createServer(app)
 require("dotenv").config()
 
 // firebase cloude messaging
-var firebase = require("firebase-admin");
+// var firebase = require("firebase-admin");
 
-var serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+// var serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
-firebase.initializeApp({
-    credential: firebase.credential.cert(serviceAccount)
-});
+// firebase.initializeApp({
+//     credential: firebase.credential.cert(serviceAccount)
+// });
 
 
 
