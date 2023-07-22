@@ -41,7 +41,7 @@ const loginUser = async (req, res) => {
 }
 const getAllUsers = async (req, res) => {
     try {
-        const result = await User.find({}, "name email profileImg _id active conversationIDs")
+        const result = await User.find({}, "name email profileImg _id active conversationIDs notificationToken")
 
         // sending all user after updating their active status
         const updated = result.map(user => {
@@ -72,9 +72,15 @@ const getUser = async (req, res) => {
     }
 }
 
+const updateNotificationToken = async (req, res) => {
+    await User.updateOne({ email: req.body.email }, { $set: { notificationToken: req.body.token } })
+    res.send({message: "token saved successfully!"})
+}
+
 module.exports = {
     signupController,
     getAllUsers,
     getUser,
-    loginUser
+    loginUser,
+    updateNotificationToken
 }

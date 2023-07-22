@@ -6,7 +6,8 @@ const UserSchema = new mongoose.Schema({
     password: String,
     email: String,
     conversationIDs: Array,
-    active: Boolean
+    active: Boolean,
+    notificationToken: String
 }, { timestamps: true })
 const User = mongoose.model("people", UserSchema)
 module.exports = User

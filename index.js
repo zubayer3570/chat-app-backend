@@ -10,6 +10,19 @@ app.use(cors())
 const { Server } = require("socket.io")
 const { createServer } = require("http")
 const httpServer = createServer(app)
+require("dotenv").config()
+
+// firebase cloude messaging
+var firebase = require("firebase-admin");
+
+var serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+
+firebase.initializeApp({
+    credential: firebase.credential.cert(serviceAccount)
+});
+
+
+
 // socket.io server instance
 const io = new Server(httpServer, {
     cors: {
@@ -63,7 +76,8 @@ const { allUsersRoute } = require("./Routes/allUsers.route")
 const { sendTextRoute } = require("./Routes/sendText.route")
 const { getTextsRoute } = require("./Routes/getTexts.route")
 const { updateUnreadRoute } = require("./Routes/updateUnread.route")
-const { addConversation } = require("./Contorllers/conversation.controller")
+const { addConversationRoute } = require("./Routes/addConversation")
+const { notificationTokenRoute } = require("./Routes/updateNotificationToken.route")
 
 app.use('/signup', signupRoute)
 app.use('/login', loginUserRouter)
@@ -71,7 +85,8 @@ app.use('/all-users', allUsersRoute)
 app.use('/send-text', sendTextRoute)
 app.use('/get-texts', getTextsRoute)
 app.use('/update-unread', updateUnreadRoute)
-app.use('/add-conversation', addConversation)
+app.use('/add-conversation', addConversationRoute)
+app.use('/update-notification-token', notificationTokenRoute)
 
 app.post('/send-height', (req, res) => {
     console.log(req.body)
