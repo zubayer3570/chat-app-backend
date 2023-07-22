@@ -12,13 +12,13 @@ const httpServer = createServer(app)
 require("dotenv").config()
 
 // firebase cloude messaging
-// var firebase = require("firebase-admin");
+const firebase = require("firebase-admin");
 
-// var serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
-// firebase.initializeApp({
-//     credential: firebase.credential.cert(serviceAccount)
-// });
+firebase.initializeApp({
+    credential: firebase.credential.cert(serviceAccount)
+});
 
 
 
