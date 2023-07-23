@@ -37,7 +37,6 @@ io.on("connection", (socket) => {
     global.socket = socket
 
     socket.on("new_active_user", (data) => {
-        console.log(data.userEmail)
         global.activeUsers.set(data.userEmail, data.socketID)
         global.activeUsersEmail = [...activeUsers.keys()]
         io.emit("active_status_updated", activeUsersEmail)
