@@ -2,11 +2,12 @@ const Conversation = require("../Models/Conversation.model")
 const User = require("../Models/User.model")
 
 const addConversation = async (req, res) => {
-    const conversation = req.body
-    const newConversation = new Conversation(conversation)
-    await newConversation.save()
-    await User.updateMany({_id: conversation.participantsIDs.split("###")}, {$push:{conversationIDs: conversation._id}})
-    res.send(newConversation)
+    // const conversation = req.body
+    // const newConversation = new Conversation(conversation)
+    // await newConversation.save()
+    // await User.updateMany({_id: conversation.participantsIDs.split("###")}, {$push:{conversationIDs: conversation._id}})
+    // res.send(newConversation)
+    res.send({})
 }
 
 

@@ -6,7 +6,6 @@ const sendText = async (req, res) => {
     // Saving message to database
     try {
         const message = req.body
-        console.log(message)
         const newMessage = new Message(message)
         const insertedMessage = await newMessage.save()
         await Conversation.updateOne({ _id: message.conversationID }, { $set: { lastMessage: message } })
