@@ -28,7 +28,7 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email })
         // console.log(user)
         if (user && user.password == password) {
-            const conversations = await Conversation.find({ _id: user.conversationIDs })
+            const conversations = await Conversation.find({ _id: user.conversationIDs }).sort({updatedAt: "-1"})
             res.send({ user, conversations })
             // res.send({ ...user._doc, conversations: populatedConversations })
         } else {
