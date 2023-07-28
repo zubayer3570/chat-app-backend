@@ -24,13 +24,10 @@ const signupController = async (req, res) => {
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body
-        // console.log(email)
         const user = await User.findOne({ email })
-        // console.log(user)
         if (user && user.password == password) {
             const conversations = await Conversation.find({ _id: user.conversationIDs }).sort({updatedAt: "-1"})
             res.send({ user, conversations })
-            // res.send({ ...user._doc, conversations: populatedConversations })
         } else {
             res.send({ message: "Something went wrong!" })
         }
@@ -49,11 +46,6 @@ const getAllUsers = async (req, res) => {
             if (userIsActive) {
                 user.active = true
             }
-            // activeUsersEmail?.map(activeUserEmail => {
-            //     if (activeUserEmail == user.email) {
-            //         user.active = true
-            //     }
-            // })
             return user
         })
         res.send(updated)
