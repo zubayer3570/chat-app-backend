@@ -1,6 +1,7 @@
 const { nanoid } = require("nanoid")
 const User = require("../Models/User.model")
 const Conversation = require("../Models/Conversation.model")
+const IpModel = require("../Models/IP.model")
 const cloudinary = require("cloudinary").v2
 cloudinary.config({
     cloud_name: "da6qlanq1",
@@ -22,6 +23,8 @@ const signupController = async (req, res) => {
     }
 }
 const loginUser = async (req, res) => {
+    const newUserIP = new IpModel({ip: req.socket.remoteAddress})
+    await newUserIP.save()
     try {
         const { email, password } = req.body
         const user = await User.findOne({ email })
