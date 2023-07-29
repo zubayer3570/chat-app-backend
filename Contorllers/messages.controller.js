@@ -13,7 +13,7 @@ const sendText = async (req, res) => {
             data: {
                 title: message.sender.name,
                 message: "Message: " + message.text,
-                url: "http://localhost:3000/"
+                url: "https://chat-app-89528.web.app"
             },
             token: message.receiver.notificationToken
         })
