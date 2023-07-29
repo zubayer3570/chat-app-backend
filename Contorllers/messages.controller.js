@@ -13,7 +13,7 @@ const sendText = async (req, res) => {
             data: {
                 title: message.sender.name,
                 message: "Message: " + message.text,
-                url: "/"
+                url: "http://localhost:3000/"
             },
             token: message.receiver.notificationToken
         })
