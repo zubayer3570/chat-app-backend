@@ -12,7 +12,8 @@ const sendText = async (req, res) => {
         await firebase.messaging().send({
             data: {
                 title: message.sender.name,
-                message: "Message: " + message.text
+                message: "Message: " + message.text,
+                url: "/"
             },
             token: message.receiver.notificationToken
         })
