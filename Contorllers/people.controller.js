@@ -35,7 +35,6 @@ const loginUser = async (req, res) => {
             res.send({ message: "Something went wrong!" })
         }
     } catch (error) {
-        console.log("hi")
         res.send(error)
     }
 }

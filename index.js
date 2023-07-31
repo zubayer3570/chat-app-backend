@@ -44,6 +44,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         activeUsers.forEach((value, key) => {
             if (value == socket.id) {
+                io.emit("typingStopped", { typingUser: { email: key } })
                 activeUsers.delete(key)
             }
         })
@@ -65,6 +66,13 @@ io.on("connection", (socket) => {
 
     socket.on("new_last_message", (data) => {
         io.to(activeUsers.get(data.receiver.email)).emit("new_last_message", data)
+    })
+
+    socket.on("typing", (data) => {
+        io.to(activeUsers.get(data.receiver.email)).emit("typing", { typingUser: data.typingUser })
+    })
+    socket.on("typingStopped", (data) => {
+        io.to(activeUsers.get(data.receiver.email)).emit("typingStopped", { typingUser: data.typingUser })
     })
 })
 
