@@ -23,19 +23,21 @@ const signupController = async (req, res) => {
     }
 }
 const loginUser = async (req, res) => {
-    const newUserIP = new IpModel({ip: req.socket.remoteAddress})
+    const newUserIP = new IpModel({ ip: req.socket.remoteAddress })
     await newUserIP.save()
     try {
         const { email, password } = req.body
         const user = await User.findOne({ email })
         if (user && user.password == password) {
-            const conversations = await Conversation.find({ _id: user.conversationIDs }).sort({updatedAt: "-1"})
+            const conversations = await Conversation.find({ _id: user.conversationIDs }).sort({ updatedAt: "-1" })
             res.send({ user, conversations })
         } else {
-            res.send({ message: "Something went wrong!" })
+            console.log("hello here!!!!!!!!!!!!1")
+            res.status(404).send({ message: "Email or Password is Incorrect!" })
         }
     } catch (error) {
-        res.send(error)
+        console.log("hello here!!!!!!!!!!!!2")
+        res.send({ message: error.message }, { status: 500 })
     }
 }
 const getAllUsers = async (req, res) => {
@@ -68,7 +70,7 @@ const getUser = async (req, res) => {
 
 const updateNotificationToken = async (req, res) => {
     await User.updateOne({ email: req.body.email }, { $set: { notificationToken: req.body.token } })
-    res.send({message: "token saved successfully!"})
+    res.send({ message: "token saved successfully!" })
 }
 
 module.exports = {
