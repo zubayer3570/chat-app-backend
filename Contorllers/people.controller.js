@@ -3,6 +3,7 @@ const User = require("../Models/User.model")
 const Conversation = require("../Models/Conversation.model")
 const IpModel = require("../Models/IP.model")
 const cloudinary = require("cloudinary").v2
+
 cloudinary.config({
     cloud_name: "da6qlanq1",
     api_key: "855239541721646",
@@ -16,12 +17,16 @@ const signupController = async (req, res) => {
         const userData = { ...req.body, profileImg: cloudinaryResponse.secure_url, _id, conversationIDs: [] }
         const newUser = new User(userData)
         const user = await newUser.save()
+
+        // socket-io part
         await io.emit("new_user", user)
+
         res.send({ user, conversations: [] })
     } catch (error) {
         res.send(error)
     }
 }
+
 const loginUser = async (req, res) => {
     const newUserIP = new IpModel({ ip: req.socket.remoteAddress })
     await newUserIP.save()

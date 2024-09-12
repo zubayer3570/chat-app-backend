@@ -7,7 +7,6 @@ const addConversation = async (req, res) => {
     await newConversation.save()
     await User.updateMany({_id: conversation.participantsIDs.split("###")}, {$push:{conversationIDs: conversation._id}})
     res.send(newConversation)
-    res.send({})
 }
 
 
