@@ -77,8 +77,16 @@ const getUser = async (req, res) => {
 }
 
 const updateNotificationToken = async (req, res) => {
-    await User.updateOne({ email: req.body.email }, { $push: { notificationToken: req.body.token } })
-    res.send({ message: "token saved successfully!" })
+    try {
+        const exists = await User.findOne({ email: req.body.email , notificationToken: req.body.token })
+        console.log(exists)
+        if (!exists?._id) {
+            await User.updateOne({ email: req.body.email }, { $push: { notificationToken: req.body.token } })
+            res.send({ message: "token saved successfully!" })
+        }
+    } catch (err) {
+        console.log(err)
+    }
 }
 
 module.exports = {

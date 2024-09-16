@@ -12,15 +12,20 @@ const sendText = async (req, res) => {
 
         await Conversation.updateOne({ _id: message.conversationID }, { $set: { lastMessage: newMessage._id } })
 
+
+        const fetchedMessage = await Message.findOne({ _id: newMessage._id }).populate(["sender", "receiver"])
+
         // firebase notification sending
-        // await firebase.messaging().send({
-        //     data: {
-        //         title: message.sender.name,
-        //         message: "Message: " + message.text,
-        //         url: "https://chat-app-89528.web.app"
-        //     },
-        //     token: message.receiver.notificationToken
-        // })
+        for (let i = 0; i < fetchedMessage.receiver.notificationToken; i++) {
+            await firebase.messaging().send({
+                data: {
+                    title: fetchedMessage.sender.name,
+                    message: "Message: " + fetchedMessage.text,
+                    url: "https://chat-app-89528.web.app"
+                },
+                token: fetchedMessage.receiver.notificationToken[i]
+            })
+        }
 
         //sending response to the client
         res.send({ message: insertedMessage })
