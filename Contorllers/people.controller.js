@@ -1,7 +1,7 @@
-const { nanoid } = require("nanoid")
 const User = require("../Models/User.model")
 const Conversation = require("../Models/Conversation.model")
 const IpModel = require("../Models/IP.model")
+const { ObjectId } = require("bson")
 const cloudinary = require("cloudinary").v2
 
 cloudinary.config({
@@ -13,7 +13,7 @@ cloudinary.config({
 const signupController = async (req, res) => {
     try {
         const cloudinaryResponse = await cloudinary.uploader.upload("upload/" + req.file.filename, { resource_type: "image", use_filename: true })
-        const _id = nanoid()
+        const _id = new ObjectId()
         const userData = { ...req.body, profileImg: cloudinaryResponse.secure_url, _id, conversationIDs: [] }
         const newUser = new User(userData)
         const user = await newUser.save()
@@ -34,17 +34,20 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body
         const user = await User.findOne({ email })
         if (user && user.password == password) {
-            const conversations = await Conversation.find({ _id: user.conversationIDs }).sort({ updatedAt: "-1" })
+            const conversations = await Conversation.find({ _id: user.conversationIDs })
+                .populate({ path: "lastMessage", populate: { path: "sender" } })
+                .populate({ path: "lastMessage", populate: { path: "receiver" } })
+                .sort({ updatedAt: "-1" })
             res.send({ user, conversations })
         } else {
-            console.log("hello here!!!!!!!!!!!!1")
             res.status(404).send({ message: "Email or Password is Incorrect!" })
         }
     } catch (error) {
-        console.log("hello here!!!!!!!!!!!!2")
         res.send({ message: error.message }, { status: 500 })
     }
 }
+
+
 const getAllUsers = async (req, res) => {
     try {
         const result = await User.find({}, "name email profileImg _id active conversationIDs notificationToken")
@@ -74,7 +77,7 @@ const getUser = async (req, res) => {
 }
 
 const updateNotificationToken = async (req, res) => {
-    await User.updateOne({ email: req.body.email }, { $set: { notificationToken: req.body.token } })
+    await User.updateOne({ email: req.body.email }, { $push: { notificationToken: req.body.token } })
     res.send({ message: "token saved successfully!" })
 }
 

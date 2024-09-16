@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^1.2.1",
     "browser-env": "^3.3.0",
+    "bson": "^6.8.0",
     "cloudinary": "^1.37.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

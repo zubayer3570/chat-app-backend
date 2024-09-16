@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+
 const UserSchema = new mongoose.Schema({
     _id: String,
     profileImg: String,
@@ -7,7 +8,8 @@ const UserSchema = new mongoose.Schema({
     email: String,
     conversationIDs: Array,
     active: Boolean,
-    notificationToken: String
+    notificationToken: Array
 }, { timestamps: true })
+
 const User = mongoose.model("people", UserSchema)
 module.exports = User
