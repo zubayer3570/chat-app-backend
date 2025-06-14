@@ -1,8 +1,14 @@
 const mongoose = require("mongoose")
 
 const ConversationSchema = new mongoose.Schema({
-    _id: String,
-    participantsIDs: String,
+    userId_1: {
+        type: mongoose.Types.ObjectId,
+        ref: "user"
+    },
+    userId_2: {
+        type: mongoose.Types.ObjectId,
+        ref: "user"
+    },
     lastMessage: {
         type: mongoose.Types.ObjectId,
         ref: "message"

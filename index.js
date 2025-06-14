@@ -1,6 +1,6 @@
 const { nanoid } = require("nanoid")
 const mongoose = require("mongoose")
-mongoose.connect("mongodb+srv://database-user-1:databaseofzubayer@cluster0.1f3iy.mongodb.net/chat-app?retryWrites=true&w=majority")
+mongoose.connect("mongodb+srv://zubayer-mh:amizubayer01@cluster0.prufx.mongodb.net/chat-app?retryWrites=true&w=majority&appName=Cluster0")
 const express = require("express")
 const app = express()
 const cors = require("cors")
@@ -85,7 +85,7 @@ io.on("connection", (socket) => {
 
 // socket
 
-const { signupRoute } = require("./Routes/sinup.route")
+const { signupRoute } = require("./Routes/signup.route")
 const { loginUserRouter } = require("./Routes/login.route")
 const { allUsersRoute } = require("./Routes/allUsers.route")
 const { sendTextRoute } = require("./Routes/sendText.route")

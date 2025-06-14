@@ -1,4 +1,4 @@
-const { signupController } = require("../Contorllers/people.controller")
+const { signupController } = require("../Contorllers/user.controller")
 const fs = require("fs")
 
 // **********image upload*****************

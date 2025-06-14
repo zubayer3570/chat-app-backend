@@ -3,6 +3,9 @@ const Conversation = require("../Models/Conversation.model")
 const IpModel = require("../Models/IP.model")
 const { ObjectId } = require("bson")
 const cloudinary = require("cloudinary").v2
+const {hash_password, compare_password} = require("../utilities/hash_password")
+const {create_access_token, create_refresh_token} = require("../utilities/create_tokens")
+const jwt = require("jsonwebtoken")
 
 cloudinary.config({
     cloud_name: "da6qlanq1",
@@ -13,16 +16,28 @@ cloudinary.config({
 const signupController = async (req, res) => {
     try {
         const cloudinaryResponse = await cloudinary.uploader.upload("upload/" + req.file.filename, { resource_type: "image", use_filename: true })
-        const _id = new ObjectId()
-        const userData = { ...req.body, profileImg: cloudinaryResponse.secure_url, _id, conversationIDs: [] }
+        const userData = { ...req.body, password: await hash_password(req.body.password), profileImg: cloudinaryResponse.secure_url}
+
         const newUser = new User(userData)
         const user = await newUser.save()
+
+        const access_token = create_access_token(user)
+        const refresh_token = create_refresh_token(user)
+
+        res.cookie("refreshToken", refresh_token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+            path: "/refresh",
+            maxage: 7 * 24 * 60 * 60 * 1000
+        })
 
         // socket-io part
         await io.emit("new_user", user)
 
-        res.send({ user, conversations: [] })
+        res.json({accessToken: access_token})
     } catch (error) {
+        console.log(error)
         res.send(error)
     }
 }
@@ -33,24 +48,51 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body
         const user = await User.findOne({ email })
-        if (user && user.password == password) {
-            const conversations = await Conversation.find({ _id: user.conversationIDs })
-                .populate({ path: "lastMessage", populate: { path: "sender" } })
-                .populate({ path: "lastMessage", populate: { path: "receiver" } })
-                .sort({ updatedAt: "-1" })
-            res.send({ user, conversations })
+
+        if (user && await compare_password(password, user.password) == true) {
+            // const conversations = await Conversation.find({$or: [{ userId_1: user._id, userId_2: user._id }]})
+            //     .populate({ path: "lastMessage", populate: { path: "sender" } })
+            //     .populate({ path: "lastMessage", populate: { path: "receiver" } })
+            //     .sort({ updatedAt: "-1" })
+            
+            const access_token = create_access_token(user._doc)
+            const refresh_token = create_refresh_token(user._doc)
+
+
+            res.cookie("refreshToken", refresh_token, {
+                httpOnly: true,
+                secure: false,
+                sameSite: "strict",
+                path: "/refresh",
+                maxage: 7 * 24 * 60 * 60 * 1000
+            })
+
+            res.json({accessToken: access_token})
         } else {
             res.status(404).send({ message: "Email or Password is Incorrect!" })
         }
     } catch (error) {
-        res.send({ message: error.message }, { status: 500 })
+        res.status(401).send({ message: error.message })
     }
 }
 
+const refresh = async (req, res) => {
+    token = req.cookie.refreshToken
+    if (!token) {
+        res.sendStatus(401)
+    }
+    try {
+        const user = jwt.verify(token, "public")
+        const newAccessToken = create_access_token(user)
+        res.json({accessToken: newAccessToken})
+    } catch (err) {
+        res.status(500).json({message: err})
+    }
+}
 
 const getAllUsers = async (req, res) => {
     try {
-        const result = await User.find({}, "name email profileImg _id active conversationIDs notificationToken")
+        const result = await User.find()
 
         // sending all user after updating their active status
         const updated = result.map(user => {
@@ -69,7 +111,7 @@ const getAllUsers = async (req, res) => {
 const getUser = async (req, res) => {
     const { userID } = req.params
     try {
-        const user = await People.findOne({ _id: userID })
+        const user = await User.findOne({ _id: userID })
         res.send(user)
     } catch (error) {
         res.send(error)
@@ -94,5 +136,12 @@ module.exports = {
     getAllUsers,
     getUser,
     loginUser,
-    updateNotificationToken
+    updateNotificationToken,
+    refresh
 }
+
+
+
+
+
+

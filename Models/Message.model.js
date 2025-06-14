@@ -2,15 +2,17 @@ const mongoose = require("mongoose")
 
 
 const MsgSchema = new mongoose.Schema({
-    _id: String,
-    conversationID: String,
+    conversationID: {
+        type: mongoose.Types.ObjectId,
+        ref: "conversation"
+    },
     sender: {
         type: mongoose.Types.ObjectId,
-        ref: "people"
+        ref: "user"
     },
     receiver: {
         type: mongoose.Types.ObjectId,
-        ref: "people",
+        ref: "user",
     },
     text: String,
     unread: Boolean

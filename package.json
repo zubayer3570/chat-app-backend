@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.2.1",
+    "bcrypt": "^6.0.0",
     "browser-env": "^3.3.0",
     "bson": "^6.8.0",
     "cloudinary": "^1.37.3",
@@ -17,10 +18,11 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "firebase-admin": "^11.10.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^6.7.0",
     "multer": "^1.4.5-lts.1",
     "nanoid": "^3.3.6",
-    "nodemon": "^3.1.4",
+    "nodemon": "^3.1.10",
     "path": "^0.12.7",
     "socket.io": "^4.5.3"
   }

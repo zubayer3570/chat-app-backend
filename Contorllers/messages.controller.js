@@ -7,7 +7,12 @@ const sendText = async (req, res) => {
     // Saving message to database
     try {
         const message = req.body
-        const newMessage = new Message({ _id: new ObjectId(), ...message })
+        if (!message.conversationID){
+            const insertedConversation = new Conversation({ userId_1: message.sender, userId_2: message.receiver })
+            const newConversation = await insertedConversation.save()
+            message["conversationID"] = newConversation._id
+        }
+        const newMessage = new Message({ message })
         const insertedMessage = await newMessage.save()
 
         await Conversation.updateOne({ _id: message.conversationID }, { $set: { lastMessage: newMessage._id } })

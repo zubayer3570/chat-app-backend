@@ -1,5 +1,5 @@
 const express = require("express")
-const { updateNotificationToken } = require("../Contorllers/people.controller")
+const { updateNotificationToken } = require("../Contorllers/user.controller")
 
 const router = express.Router()
 
