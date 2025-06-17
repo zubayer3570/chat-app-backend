@@ -21,8 +21,8 @@ const signupController = async (req, res) => {
         const newUser = new User(userData)
         const user = await newUser.save()
 
-        const access_token = create_access_token(user)
-        const refresh_token = create_refresh_token(user)
+        const access_token = create_access_token({user: {...user._doc, _id: user._doc._id.toString()}})
+        const refresh_token = create_refresh_token({user: {...user._doc, _id: user._doc._id.toString()}})
 
         res.cookie("refreshToken", refresh_token, {
             httpOnly: true,
@@ -37,7 +37,7 @@ const signupController = async (req, res) => {
 
         res.json({accessToken: access_token})
     } catch (error) {
-        console.log(error)
+        // // console.log(error)
         res.send(error)
     }
 }
@@ -55,14 +55,14 @@ const loginUser = async (req, res) => {
             //     .populate({ path: "lastMessage", populate: { path: "receiver" } })
             //     .sort({ updatedAt: "-1" })
             
-            const access_token = create_access_token(user._doc)
-            const refresh_token = create_refresh_token(user._doc)
-
+            const access_token = create_access_token({user: {...user._doc, _id: user._doc._id.toString()}})
+            const refresh_token = create_refresh_token({user: {...user._doc, _id: user._doc._id.toString()}})
+            // // console.log("this is refresh token", refresh_token)
 
             res.cookie("refreshToken", refresh_token, {
                 httpOnly: true,
                 secure: false,
-                sameSite: "strict",
+                // sameSite: "strict",
                 path: "/refresh",
                 maxage: 7 * 24 * 60 * 60 * 1000
             })
@@ -72,20 +72,25 @@ const loginUser = async (req, res) => {
             res.status(404).send({ message: "Email or Password is Incorrect!" })
         }
     } catch (error) {
-        res.status(401).send({ message: error.message })
+        res.status(500).send({ message: error.message })
     }
 }
 
 const refresh = async (req, res) => {
-    token = req.cookie.refreshToken
+    token = req.cookies.refreshToken
+    // // console.log(req.cookies)
     if (!token) {
-        res.sendStatus(401)
+        // // console.log("no token")
+        return res.sendStatus(401)
     }
     try {
-        const user = jwt.verify(token, "public")
-        const newAccessToken = create_access_token(user)
-        res.json({accessToken: newAccessToken})
+        const decoded = jwt.verify(token, "privatekey")
+        console.log("usersssssssssssssss", decoded)
+        const newAccessToken = create_access_token({user: decoded.user})
+        console.log("newnewwwwwwwwwwww", newAccessToken)
+        return res.send({accessToken: newAccessToken})
     } catch (err) {
+        // console.log("this is here", err)
         res.status(500).json({message: err})
     }
 }
@@ -104,7 +109,7 @@ const getAllUsers = async (req, res) => {
         })
         res.send(updated)
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.send(error)
     }
 }
@@ -121,13 +126,13 @@ const getUser = async (req, res) => {
 const updateNotificationToken = async (req, res) => {
     try {
         const exists = await User.findOne({ email: req.body.email , notificationToken: req.body.token })
-        console.log(exists)
+        // console.log(exists)
         if (!exists?._id) {
             await User.updateOne({ email: req.body.email }, { $push: { notificationToken: req.body.token } })
             res.send({ message: "token saved successfully!" })
         }
     } catch (err) {
-        console.log(err)
+        // console.log(err)
     }
 }
 

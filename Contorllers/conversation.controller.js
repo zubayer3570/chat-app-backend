@@ -20,10 +20,10 @@ const addConversation = async (req, res) => {
             .populate({ path: "lastMessage", populate: { path: "receiver" } })
             .populate({ path: "lastMessage", populate: { path: "sender" } })
 
-        console.log("this is fetched", fetchedNewConversaton)
+        // console.log("this is fetched", fetchedNewConversaton)
         res.send({ newConversation: fetchedNewConversaton })
     } catch (err) {
-        console.log(err)
+        // console.log(err)
     }
 }
 
@@ -34,7 +34,7 @@ const updateUnread = async (req, res) => {
         const updatedMessage = await Message.findOneAndUpdate({ _id: lastMessage?._id }, { unread: false }, { new: true }).populate(["sender", "receiver"])
         res.send({ updatedMessage })
     } catch (err) {
-        console.log(err)
+        // console.log(err)
     }
 }
 

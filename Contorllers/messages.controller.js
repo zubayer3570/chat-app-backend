@@ -35,7 +35,7 @@ const sendText = async (req, res) => {
         //sending response to the client
         res.send({ message: insertedMessage })
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.send(error)
     }
 }
@@ -47,7 +47,7 @@ const getTexts = async (req, res) => {
         const conversations = await Message.find({ conversationID }).populate(["sender", "receiver"])
         res.send(conversations)
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.send([])
     }
 }

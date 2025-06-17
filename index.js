@@ -5,7 +5,18 @@ const express = require("express")
 const app = express()
 const cors = require("cors")
 app.use(express.json())
-app.use(cors())
+
+app.use(cors(
+    {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+))
+
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 const { Server } = require("socket.io")
 const { createServer } = require("http")
 const httpServer = createServer(app)
@@ -63,7 +74,7 @@ io.on("connection", (socket) => {
 
     // new conversation
     socket.on("new_conversation", (data) => {
-        console.log("server/recived/new-conv: ", data)
+        // console.log("server/recived/new-conv: ", data)
         io.to(activeUsers.get(data.lastMessage?.receiver?.email)).emit("new_conversation", data)
     })
 
@@ -87,6 +98,7 @@ io.on("connection", (socket) => {
 
 const { signupRoute } = require("./Routes/signup.route")
 const { loginUserRouter } = require("./Routes/login.route")
+const { refreshTokenRoute } = require("./Routes/refreshToken.route")
 const { allUsersRoute } = require("./Routes/allUsers.route")
 const { sendTextRoute } = require("./Routes/sendText.route")
 const { getTextsRoute } = require("./Routes/getTexts.route")
@@ -97,6 +109,7 @@ const { testRoute } = require("./Routes/test.route")
 
 app.use('/signup', signupRoute)
 app.use('/login', loginUserRouter)
+app.use("/refresh", refreshTokenRoute)
 app.use('/all-users', allUsersRoute)
 app.use('/send-text', sendTextRoute)
 app.use('/get-texts', getTextsRoute)
@@ -106,7 +119,7 @@ app.use('/update-notification-token', notificationTokenRoute)
 app.use("/test", testRoute)
 
 app.post('/send-height', (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
 })
 
 app.get('/', (req, res) => {
@@ -114,4 +127,7 @@ app.get('/', (req, res) => {
     res.send("server is working fine!!!")
 })
 
-httpServer.listen(5000, () => console.log("server working!!!"))
+httpServer.listen(
+    5000, 
+    () => console.log("server working!!!")
+)

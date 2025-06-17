@@ -1,17 +1,20 @@
 const jwt = require("jsonwebtoken")
 
 const jwt_verification = (req, res, next) => {
+    // next()
+    // console.log(req.headers)
+
     const authorization = req.headers["authorization"]
     const token = authorization && authorization.split(" ")[1]
     if (!token){
-        res.send({message: "No authorization token!"})
+        return res.status(500).send({message: "No authorization token!"})
     }
     try {
-        user = jwt.verify(token, "publickey")
+        user = jwt.verify(token, "privatekey")
         req.user = user
         next()
     } catch (err) {
-        res.status(403).json({message: "Invalid or expired token"})
+        return res.status(401).send({message: "Invalid Token!!!"})
     }
 }
 
