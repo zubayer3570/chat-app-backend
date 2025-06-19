@@ -67,7 +67,7 @@ io.on("connection", (socket) => {
 
     // new message
     socket.on("new_message", (data) => {
-        if (data.conversationID) {
+        if (data.conversationId) {
             io.to(activeUsers.get(data.receiver.email)).emit("new_message", data)
         }
     })
@@ -106,6 +106,7 @@ const { updateUnreadRoute } = require("./Routes/updateUnread.route")
 const { addConversationRoute } = require("./Routes/addConversation")
 const { notificationTokenRoute } = require("./Routes/updateNotificationToken.route")
 const { testRoute } = require("./Routes/test.route")
+const { getConversationsRoute } = require("./Routes/getConversations.route")
 
 app.use('/signup', signupRoute)
 app.use('/login', loginUserRouter)
@@ -114,6 +115,7 @@ app.use('/all-users', allUsersRoute)
 app.use('/send-text', sendTextRoute)
 app.use('/get-texts', getTextsRoute)
 app.use('/update-unread', updateUnreadRoute)
+app.use('/get-conversations', getConversationsRoute)
 app.use('/add-conversation', addConversationRoute)
 app.use('/update-notification-token', notificationTokenRoute)
 app.use("/test", testRoute)

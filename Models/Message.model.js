@@ -2,7 +2,10 @@ const mongoose = require("mongoose")
 
 
 const MsgSchema = new mongoose.Schema({
-    conversationID: {
+    _id: {
+        type: mongoose.Types.ObjectId,
+    },
+    conversationId: {
         type: mongoose.Types.ObjectId,
         ref: "conversation"
     },

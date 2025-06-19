@@ -50,10 +50,6 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email })
 
         if (user && await compare_password(password, user.password) == true) {
-            // const conversations = await Conversation.find({$or: [{ userId_1: user._id, userId_2: user._id }]})
-            //     .populate({ path: "lastMessage", populate: { path: "sender" } })
-            //     .populate({ path: "lastMessage", populate: { path: "receiver" } })
-            //     .sort({ updatedAt: "-1" })
             
             const access_token = create_access_token({user: {...user._doc, _id: user._doc._id.toString()}})
             const refresh_token = create_refresh_token({user: {...user._doc, _id: user._doc._id.toString()}})
@@ -85,9 +81,9 @@ const refresh = async (req, res) => {
     }
     try {
         const decoded = jwt.verify(token, "privatekey")
-        console.log("usersssssssssssssss", decoded)
+        // console.log("usersssssssssssssss", decoded)
         const newAccessToken = create_access_token({user: decoded.user})
-        console.log("newnewwwwwwwwwwww", newAccessToken)
+        // console.log("newnewwwwwwwwwwww", newAccessToken)
         return res.send({accessToken: newAccessToken})
     } catch (err) {
         // console.log("this is here", err)

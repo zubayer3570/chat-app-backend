@@ -6,16 +6,25 @@ const { ObjectId } = require("bson");
 const sendText = async (req, res) => {
     // Saving message to database
     try {
-        const message = req.body
-        if (!message.conversationID){
-            const insertedConversation = new Conversation({ userId_1: message.sender, userId_2: message.receiver })
-            const newConversation = await insertedConversation.save()
-            message["conversationID"] = newConversation._id
+
+        const { message } = req.body
+        _id = new ObjectId()
+
+        try {
+            if (!message.conversationId) {
+                const newConversation = new Conversation({ userId_1: message.sender, userId_2: message.receiver, lastMessageId: _id })
+                const newConversationInserted = await newConversation.save()
+                console.log(newConversationInserted)
+                message["conversationId"] = newConversationInserted._id
+            }
+        } catch (err) {
+            console.log(err)
         }
-        const newMessage = new Message({ message })
+
+        const newMessage = new Message({ _id, ...message })
         const insertedMessage = await newMessage.save()
 
-        await Conversation.updateOne({ _id: message.conversationID }, { $set: { lastMessage: newMessage._id } })
+        await Conversation.updateOne({ _id: message.conversationId }, { $set: { lastMessage: newMessage._id } })
 
 
         const fetchedMessage = await Message.findOne({ _id: newMessage._id }).populate(["sender", "receiver"])
@@ -42,9 +51,9 @@ const sendText = async (req, res) => {
 
 
 const getTexts = async (req, res) => {
-    const { conversationID } = req.body
+    const { conversationId } = req.body
     try {
-        const conversations = await Message.find({ conversationID }).populate(["sender", "receiver"])
+        const conversations = await Message.find({ conversationId }).populate(["sender", "receiver"])
         res.send(conversations)
     } catch (error) {
         // console.log(error)
