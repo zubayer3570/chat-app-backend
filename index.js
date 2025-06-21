@@ -32,70 +32,6 @@ firebase.initializeApp({
 
 
 
-// socket.io server instance
-const io = new Server(httpServer, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-})
-
-
-global.activeUsers = new Map()
-global.io = io
-io.on("connection", (socket) => {
-    global.socket = socket
-
-    // an user became active
-    socket.on("new_active_user", (data) => {
-        global.activeUsers.set(data.userEmail, data.socketID)
-        global.activeUsersEmail = [...activeUsers.keys()]
-        io.emit("active_status_updated", activeUsersEmail)
-    })
-
-    // user disconnected
-    socket.on("disconnect", () => {
-        activeUsers.forEach((value, key) => {
-            if (value == socket.id) {
-                io.emit("typingStopped", { typingUser: { email: key } })
-                activeUsers.delete(key)
-            }
-        })
-        global.activeUsersEmail = [...activeUsers.keys()]
-        io.emit("active_status_updated", activeUsersEmail)
-    })
-
-    // new message
-    socket.on("new_message", (data) => {
-        if (data.conversationId) {
-            io.to(activeUsers.get(data.receiver.email)).emit("new_message", data)
-        }
-    })
-
-    // new conversation
-    socket.on("new_conversation", (data) => {
-        // console.log("server/recived/new-conv: ", data)
-        io.to(activeUsers.get(data.lastMessage?.receiver?.email)).emit("new_conversation", data)
-    })
-
-    // last message updation
-    socket.on("new_last_message", (data) => {
-        io.to(activeUsers.get(data.receiver.email)).emit("new_last_message", data)
-    })
-
-    // Typing
-    socket.on("typing", (data) => {
-        io.to(activeUsers.get(data.receiver.email)).emit("typing", { typingUser: data.typingUser })
-    })
-
-    // Typing stopped
-    socket.on("typingStopped", (data) => {
-        io.to(activeUsers.get(data.receiver.email)).emit("typingStopped", { typingUser: data.typingUser })
-    })
-})
-
-// socket
-
 const { signupRoute } = require("./Routes/signup.route")
 const { loginUserRouter } = require("./Routes/login.route")
 const { refreshTokenRoute } = require("./Routes/refreshToken.route")
@@ -103,9 +39,7 @@ const { allUsersRoute } = require("./Routes/allUsers.route")
 const { sendTextRoute } = require("./Routes/sendText.route")
 const { getTextsRoute } = require("./Routes/getTexts.route")
 const { updateUnreadRoute } = require("./Routes/updateUnread.route")
-const { addConversationRoute } = require("./Routes/addConversation")
 const { notificationTokenRoute } = require("./Routes/updateNotificationToken.route")
-const { testRoute } = require("./Routes/test.route")
 const { getConversationsRoute } = require("./Routes/getConversations.route")
 
 app.use('/signup', signupRoute)
@@ -116,9 +50,7 @@ app.use('/send-text', sendTextRoute)
 app.use('/get-texts', getTextsRoute)
 app.use('/update-unread', updateUnreadRoute)
 app.use('/get-conversations', getConversationsRoute)
-app.use('/add-conversation', addConversationRoute)
 app.use('/update-notification-token', notificationTokenRoute)
-app.use("/test", testRoute)
 
 app.post('/send-height', (req, res) => {
     // console.log(req.body)
@@ -133,3 +65,7 @@ httpServer.listen(
     5000, 
     () => console.log("server working!!!")
 )
+
+module.exports = {
+    httpServer
+}

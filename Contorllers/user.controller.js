@@ -1,10 +1,8 @@
 const User = require("../Models/User.model")
-const Conversation = require("../Models/Conversation.model")
 const IpModel = require("../Models/IP.model")
-const { ObjectId } = require("bson")
 const cloudinary = require("cloudinary").v2
-const {hash_password, compare_password} = require("../utilities/hash_password")
-const {create_access_token, create_refresh_token} = require("../utilities/create_tokens")
+const { hash_password, compare_password } = require("../utilities/hash_password")
+const { create_access_token, create_refresh_token } = require("../utilities/create_tokens")
 const jwt = require("jsonwebtoken")
 
 cloudinary.config({
@@ -16,13 +14,13 @@ cloudinary.config({
 const signupController = async (req, res) => {
     try {
         const cloudinaryResponse = await cloudinary.uploader.upload("upload/" + req.file.filename, { resource_type: "image", use_filename: true })
-        const userData = { ...req.body, password: await hash_password(req.body.password), profileImg: cloudinaryResponse.secure_url}
+        const userData = { ...req.body, password: await hash_password(req.body.password), profileImg: cloudinaryResponse.secure_url }
 
         const newUser = new User(userData)
         const user = await newUser.save()
 
-        const access_token = create_access_token({user: {...user._doc, _id: user._doc._id.toString()}})
-        const refresh_token = create_refresh_token({user: {...user._doc, _id: user._doc._id.toString()}})
+        const access_token = create_access_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
+        const refresh_token = create_refresh_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
 
         res.cookie("refreshToken", refresh_token, {
             httpOnly: true,
@@ -35,7 +33,7 @@ const signupController = async (req, res) => {
         // socket-io part
         await io.emit("new_user", user)
 
-        res.json({accessToken: access_token})
+        res.json({ accessToken: access_token })
     } catch (error) {
         // // console.log(error)
         res.send(error)
@@ -50,10 +48,9 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ email })
 
         if (user && await compare_password(password, user.password) == true) {
-            
-            const access_token = create_access_token({user: {...user._doc, _id: user._doc._id.toString()}})
-            const refresh_token = create_refresh_token({user: {...user._doc, _id: user._doc._id.toString()}})
-            // // console.log("this is refresh token", refresh_token)
+
+            const access_token = create_access_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
+            const refresh_token = create_refresh_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
 
             res.cookie("refreshToken", refresh_token, {
                 httpOnly: true,
@@ -63,7 +60,7 @@ const loginUser = async (req, res) => {
                 maxage: 7 * 24 * 60 * 60 * 1000
             })
 
-            res.json({accessToken: access_token})
+            res.json({ accessToken: access_token })
         } else {
             res.status(404).send({ message: "Email or Password is Incorrect!" })
         }
@@ -74,54 +71,46 @@ const loginUser = async (req, res) => {
 
 const refresh = async (req, res) => {
     token = req.cookies.refreshToken
-    // // console.log(req.cookies)
+
     if (!token) {
-        // // console.log("no token")
         return res.sendStatus(401)
     }
+
     try {
         const decoded = jwt.verify(token, "privatekey")
-        // console.log("usersssssssssssssss", decoded)
-        const newAccessToken = create_access_token({user: decoded.user})
-        // console.log("newnewwwwwwwwwwww", newAccessToken)
-        return res.send({accessToken: newAccessToken})
+        const newAccessToken = create_access_token({ user: decoded.user })
+        return res.send({ accessToken: newAccessToken })
     } catch (err) {
-        // console.log("this is here", err)
-        res.status(500).json({message: err})
+        console.log(err)
+        res.status(500).json({ message: err })
     }
 }
+
 
 const getAllUsers = async (req, res) => {
     try {
         const result = await User.find()
 
         // sending all user after updating their active status
-        const updated = result.map(user => {
-            const userIsActive = activeUsers.get(user.email)
-            if (userIsActive) {
-                user.active = true
-            }
-            return user
-        })
-        res.send(updated)
+        // const updated = result.map(user => {
+        //     const userIsActive = activeUsers.get(user.email)
+        //     if (userIsActive) {
+        //         user.active = true
+        //     }
+        //     return user
+        // })
+
+        res.send({allUsers: result})
     } catch (error) {
         // console.log(error)
         res.send(error)
     }
 }
-const getUser = async (req, res) => {
-    const { userID } = req.params
-    try {
-        const user = await User.findOne({ _id: userID })
-        res.send(user)
-    } catch (error) {
-        res.send(error)
-    }
-}
+
 
 const updateNotificationToken = async (req, res) => {
     try {
-        const exists = await User.findOne({ email: req.body.email , notificationToken: req.body.token })
+        const exists = await User.findOne({ email: req.body.email, notificationToken: req.body.token })
         // console.log(exists)
         if (!exists?._id) {
             await User.updateOne({ email: req.body.email }, { $push: { notificationToken: req.body.token } })
@@ -135,7 +124,6 @@ const updateNotificationToken = async (req, res) => {
 module.exports = {
     signupController,
     getAllUsers,
-    getUser,
     loginUser,
     updateNotificationToken,
     refresh
