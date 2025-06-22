@@ -19,8 +19,8 @@ const signupController = async (req, res) => {
         const newUser = new User(userData)
         const user = await newUser.save()
 
-        const access_token = create_access_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
-        const refresh_token = create_refresh_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
+        const access_token = create_access_token({ user: { ...user.toObject(), _id: user.toObject()._id.toString() } })
+        const refresh_token = create_refresh_token({ user: { ...user.toObject(), _id: user.toObject()._id.toString() } })
 
         res.cookie("refreshToken", refresh_token, {
             httpOnly: true,
@@ -49,8 +49,8 @@ const loginUser = async (req, res) => {
 
         if (user && await compare_password(password, user.password) == true) {
 
-            const access_token = create_access_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
-            const refresh_token = create_refresh_token({ user: { ...user._doc, _id: user._doc._id.toString() } })
+            const access_token = create_access_token({ user: { ...user.toObject(), _id: user.toObject()._id.toString() } })
+            const refresh_token = create_refresh_token({ user: { ...user.toObject(), _id: user.toObject()._id.toString() } })
 
             res.cookie("refreshToken", refresh_token, {
                 httpOnly: true,

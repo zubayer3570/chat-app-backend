@@ -12,7 +12,7 @@ const sendText = async (req, res) => {
 
         try {
             if (!message.conversationId) {
-                const newConversation = new Conversation({ userId_1: message.sender._id, userId_2: message.receiver._id, lastMessageId: _id })
+                const newConversation = new Conversation({ userId_1: message.sender._id, userId_2: message.receiver._id, lastMessage: _id })
                 const newConversationInserted = await newConversation.save()
                 // console.log(newConversationInserted)
                 message["conversationId"] = newConversationInserted._id
@@ -22,11 +22,17 @@ const sendText = async (req, res) => {
         }
 
         const newMessage = new Message({ _id, ...message })
+        // res.send({ message: newMessage })
 
         // new message
-        getIO().to(data.receiver.email).emit("new_message", data)
+        // console.log(message.sender.email, message.receiver.email)
+        const ret = getIO()
+            .to([message.sender.email, message.receiver.email])
+            .emit("new_message", { message: { ...newMessage.toObject(), receiver: message.receiver, sender: message.sender } })
+        console.log(ret)
 
-        const insertedMessage = await newMessage.save()
+        newMessage.save()
+        await Conversation.updateOne({ _id: newMessage.conversationId }, { lastMessage: _id })
 
         // firebase notification sending
         for (let i = 0; i < message.receiver.notificationToken; i++) {
@@ -40,8 +46,10 @@ const sendText = async (req, res) => {
             })
         }
 
+        res.send({ message: { ...newMessage.toObject(), receiver: message.receiver, sender: message.sender } })
+
         //sending response to the client
-        res.send({ message: insertedMessage })
+        // res.send({ message: insertedMessage })
     } catch (error) {
         console.log(error)
         res.send(error)
@@ -64,3 +72,6 @@ module.exports = {
     sendText,
     getTexts
 }
+
+// uxN__ZBSBB8IQ8HiAAAL
+// uxN__ZBSBB8IQ8HiAAAL

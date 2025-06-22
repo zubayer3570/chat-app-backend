@@ -9,7 +9,7 @@
 import { getIO } from "./socket_connection"
 
 
-getIO.on("connection", (socket) => {
+getIO().on("connection", (socket) => {
     const userEmail = socket.handshake.query.email
     socket.join(userEmail)
 

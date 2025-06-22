@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(cors(
     {
         origin: "http://localhost:3000",
-        methods: ["GET", "POST"],
+        methods: ["GET", "POST", "PUT"],
         credentials: true
     }
 ))
@@ -41,6 +41,7 @@ const { getTextsRoute } = require("./Routes/getTexts.route")
 const { updateUnreadRoute } = require("./Routes/updateUnread.route")
 const { notificationTokenRoute } = require("./Routes/updateNotificationToken.route")
 const { getConversationsRoute } = require("./Routes/getConversations.route")
+const { createSocketServer } = require("./real_time/socket_connection")
 
 app.use('/signup', signupRoute)
 app.use('/login', loginUserRouter)
@@ -51,6 +52,9 @@ app.use('/get-texts', getTextsRoute)
 app.use('/update-unread', updateUnreadRoute)
 app.use('/get-conversations', getConversationsRoute)
 app.use('/update-notification-token', notificationTokenRoute)
+
+
+createSocketServer(httpServer)
 
 app.post('/send-height', (req, res) => {
     // console.log(req.body)
@@ -63,7 +67,10 @@ app.get('/', (req, res) => {
 
 httpServer.listen(
     5000, 
-    () => console.log("server working!!!")
+    () => {
+        
+        console.log("server working!!!")
+    }
 )
 
 module.exports = {

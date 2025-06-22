@@ -9,7 +9,7 @@ const ConversationSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: "user"
     },
-    lastMessageId: {
+    lastMessage: {
         type: mongoose.Types.ObjectId,
         ref: "message"
     }

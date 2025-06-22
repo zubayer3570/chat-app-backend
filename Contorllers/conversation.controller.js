@@ -9,7 +9,7 @@ const getConversations = async (req, res) => {
         const { userId } = req.body
 
         const conversations = await Conversation.find({ $or: [{ userId_1: userId}, {userId_2: userId }] })
-            .populate({ path: "userId_1 userId_2 lastMessageId" })
+            .populate({ path: "userId_1 userId_2 lastMessage" })
             .sort({ updatedAt: "-1" })
 
         res.send({ conversations })
