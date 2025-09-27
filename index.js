@@ -1,6 +1,6 @@
-const { nanoid } = require("nanoid")
+require("dotenv").config()
 const mongoose = require("mongoose")
-mongoose.connect("mongodb+srv://zubayer-mh:amizubayer01@cluster0.prufx.mongodb.net/chat-app?retryWrites=true&w=majority&appName=Cluster0")
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.1f3iy.mongodb.net/chat-app`)
 const express = require("express")
 const app = express()
 const cors = require("cors")
@@ -20,7 +20,6 @@ app.use(cookieParser());
 const { Server } = require("socket.io")
 const { createServer } = require("http")
 const httpServer = createServer(app)
-require("dotenv").config()
 
 // firebase cloude messaging
 const firebase = require("firebase-admin");
@@ -41,6 +40,8 @@ const { getTextsRoute } = require("./Routes/getTexts.route")
 const { updateUnreadRoute } = require("./Routes/updateUnread.route")
 const { notificationTokenRoute } = require("./Routes/updateNotificationToken.route")
 const { getConversationsRoute } = require("./Routes/getConversations.route")
+const { updateMessageRoute } = require("./Routes/updateMessage.route")
+const { deleteTextRoute } = require("./Routes/deleteText.route")
 const { createSocketServer } = require("./real_time/socket_connection")
 
 app.use('/signup', signupRoute)
@@ -52,7 +53,8 @@ app.use('/get-texts', getTextsRoute)
 app.use('/update-unread', updateUnreadRoute)
 app.use('/get-conversations', getConversationsRoute)
 app.use('/update-notification-token', notificationTokenRoute)
-
+app.use('/delete-text', deleteTextRoute)
+app.use('/update-text', updateMessageRoute)
 
 createSocketServer(httpServer)
 
@@ -61,7 +63,6 @@ app.post('/send-height', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-    const x = nanoid(30)
     res.send("server is working fine!!!")
 })
 

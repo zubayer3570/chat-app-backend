@@ -10,7 +10,7 @@ const jwt_verification = (req, res, next) => {
         return res.status(500).send({message: "No authorization token!"})
     }
     try {
-        user = jwt.verify(token, "privatekey")
+        user = jwt.verify(token, process.env.JWT_SECRET)
         req.user = user
         next()
     } catch (err) {

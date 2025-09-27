@@ -2,6 +2,8 @@ const { Server } = require("socket.io")
 
 let io = null
 
+var active_emails = []
+
 // socket.io server instance
 const createSocketServer = (httpServer) => {
     try {
@@ -16,7 +18,9 @@ const createSocketServer = (httpServer) => {
         io.on("connection", (socket) => {
             const userEmail = socket.handshake.query.email
             socket.join(userEmail)
+            active_emails.push[userEmail]
         })
+
     } catch (err) {
         console.log(err)
     }
@@ -26,7 +30,12 @@ const getIO = () => {
     return io
 }
 
+const getActiveEmails = () => {
+    return active_emails
+}
+
 module.exports = {
     getIO,
-    createSocketServer
+    createSocketServer,
+    getActiveEmails
 }

@@ -11,6 +11,7 @@ const getConversations = async (req, res) => {
         const conversations = await Conversation.find({ $or: [{ userId_1: userId}, {userId_2: userId }] })
             .populate({ path: "userId_1 userId_2 lastMessage" })
             .sort({ updatedAt: "-1" })
+        console.log(conversations)
 
         res.send({ conversations })
     } catch (error) {

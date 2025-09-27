@@ -4,6 +4,7 @@ const cloudinary = require("cloudinary").v2
 const { hash_password, compare_password } = require("../utilities/hash_password")
 const { create_access_token, create_refresh_token } = require("../utilities/create_tokens")
 const jwt = require("jsonwebtoken")
+const { getIO, getActiveEmails } = require("../real_time/socket_connection");
 
 cloudinary.config({
     cloud_name: "da6qlanq1",
@@ -13,6 +14,7 @@ cloudinary.config({
 
 const signupController = async (req, res) => {
     try {
+        console.log("signnnn")
         const cloudinaryResponse = await cloudinary.uploader.upload("upload/" + req.file.filename, { resource_type: "image", use_filename: true })
         const userData = { ...req.body, password: await hash_password(req.body.password), profileImg: cloudinaryResponse.secure_url }
 
@@ -31,11 +33,17 @@ const signupController = async (req, res) => {
         })
 
         // socket-io part
-        await io.emit("new_user", user)
+        await getIO().to(getActiveEmails()).emit("new_user", user)
+        // for (const room of io.sockets.adapter.rooms.keys()) {
+        //     if (room.includes("@")) {
+        //         console.log("User email room:", room);
+        //     }
+        // }
 
-        res.json({ accessToken: access_token })
+        console.log({ accessToken: access_token })
+        return res.send({ accessToken: access_token })
     } catch (error) {
-        // // console.log(error)
+        console.log(error)
         res.send(error)
     }
 }
@@ -100,7 +108,7 @@ const getAllUsers = async (req, res) => {
         //     return user
         // })
 
-        res.send({allUsers: result})
+        res.send({ allUsers: result })
     } catch (error) {
         // console.log(error)
         res.send(error)

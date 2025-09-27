@@ -42,7 +42,7 @@ getIO().on("connection", (socket) => {
     // new conversation
     socket().on("new_conversation", (data) => {
         // console.log("server/recived/new-conv: ", data)
-        io.to(activeUsers.get(data.lastMessage?.receiver?.email)).emit("new_conversation", data)
+        // io.to(activeUsers.get(data.lastMessage?.receiver?.email)).emit("new_conversation", data)
     })
 
     // last message updation
