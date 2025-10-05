@@ -42,6 +42,7 @@ const { notificationTokenRoute } = require("./Routes/updateNotificationToken.rou
 const { getConversationsRoute } = require("./Routes/getConversations.route")
 const { updateMessageRoute } = require("./Routes/updateMessage.route")
 const { deleteTextRoute } = require("./Routes/deleteText.route")
+const { createNewConversationRouter } = require("./Routes/createNewConversation.route")
 const { createSocketServer } = require("./real_time/socket_connection")
 
 app.use('/signup', signupRoute)
@@ -55,6 +56,7 @@ app.use('/get-conversations', getConversationsRoute)
 app.use('/update-notification-token', notificationTokenRoute)
 app.use('/delete-text', deleteTextRoute)
 app.use('/update-text', updateMessageRoute)
+app.use('/create-new-conversation', createNewConversationRouter)
 
 createSocketServer(httpServer)
 

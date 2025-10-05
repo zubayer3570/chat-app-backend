@@ -18,7 +18,16 @@ const createSocketServer = (httpServer) => {
         io.on("connection", (socket) => {
             const userEmail = socket.handshake.query.email
             socket.join(userEmail)
-            active_emails.push[userEmail]
+            active_emails.push(userEmail)
+            // console.log("io.sockets.adapter.rooms", io.sockets.adapter.rooms)
+
+            socket.on("dh_public_key_sender", (payload) => {
+                io.to([payload.to.email]).emit("dh_public_key_sender", payload)
+            })
+            socket.on("dh_public_key_receiver", (payload) => {
+                console.log("dh_public_key_receiver", payload)
+                io.to([payload.to.email]).emit("dh_public_key_receiver", payload)
+            })
         })
 
     } catch (err) {

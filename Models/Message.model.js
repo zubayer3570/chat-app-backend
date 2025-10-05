@@ -18,6 +18,11 @@ const MsgSchema = new mongoose.Schema({
         ref: "user",
     },
     text: String,
+    isEncrypted: {
+        type: Boolean,
+        default: false
+    },
+    iv: String,
     unread: Boolean
 }, { timestamps: true })
 

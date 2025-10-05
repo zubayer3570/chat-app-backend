@@ -2,13 +2,38 @@ const { ObjectId } = require("bson")
 const Conversation = require("../Models/Conversation.model")
 const User = require("../Models/User.model")
 const Message = require("../Models/Message.model")
+const { getIO } = require("../real_time/socket_connection");
+
+
+const createNewConversation = async (req, res) => {
+    try {
+
+        const { sender, receiver } = req.body
+        // console.log(sender, receiver)
+        const newConvId = new ObjectId()
+        const newConversation = new Conversation({ _id: newConvId, userId_1: sender._id, userId_2: receiver._id, lastMessage: null })
+        const insertedNewConversation = await newConversation.save()
+
+        const new_conv = { _id: newConvId, userId_1: sender, userId_2: receiver, lastMessage: null }
+
+        getIO()
+            .to([sender.email, receiver.email])
+            .emit("new_conversation", { conversation: new_conv })
+
+        res.send({ newConversation: insertedNewConversation })
+
+    } catch (error) {
+        console.log(error)
+        res.send(error)
+    }
+}
 
 
 const getConversations = async (req, res) => {
     try {
         const { userId } = req.body
-
-        const conversations = await Conversation.find({ $or: [{ userId_1: userId}, {userId_2: userId }] })
+        await Conversation.deleteMany({lastMessage: null})
+        const conversations = await Conversation.find({ $or: [{ userId_1: userId }, { userId_2: userId }] })
             .populate({ path: "userId_1 userId_2 lastMessage" })
             .sort({ updatedAt: "-1" })
         console.log(conversations)
@@ -33,6 +58,7 @@ const updateUnread = async (req, res) => {
 
 
 module.exports = {
+    createNewConversation,
+    getConversations,
     updateUnread,
-    getConversations
 }
