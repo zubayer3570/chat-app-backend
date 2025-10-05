@@ -8,8 +8,8 @@ var active_emails = []
 const createSocketServer = (httpServer) => {
     try {
         io = new Server(httpServer, {
-            : {
-                origin: "http://localhost:3000",
+            cors: {
+                origin: "*",
                 methods: ["GET", "POST"]
             }
         })
