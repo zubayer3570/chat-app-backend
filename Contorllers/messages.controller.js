@@ -57,7 +57,7 @@ const sendText = async (req, res) => {
         //         data: {
         //             title: message.sender.name,
         //             message: "Message: " + message.text,
-        //             url: "https://chat-app-89528.web.app"
+        //             url: "http://localhost:3000"
         //         },
         //         token: message.receiver.notificationToken[i]
         //     })
