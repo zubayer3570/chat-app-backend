@@ -9,7 +9,7 @@ const createSocketServer = (httpServer) => {
     try {
         io = new Server(httpServer, {
             cors: {
-                origin: "http://localhost:3000",
+                origin: "https://chat-app-89528.web.app",
                 methods: ["GET", "POST", "PUT", "DELETE"]
             }
         })
